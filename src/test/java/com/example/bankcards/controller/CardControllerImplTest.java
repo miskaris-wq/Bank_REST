@@ -104,7 +104,7 @@ class CardControllerImplTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(req)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Банковская кароточка успещно создана!"));
+                .andExpect(jsonPath("$.message").value("Банковская карточка успешно создана!"));
     }
 
     @Test
@@ -115,7 +115,7 @@ class CardControllerImplTest {
 
         mvc.perform(patch("/api/v1/cards/blocked/3"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Банковская кароточка успешно заблокирована!"));
+                .andExpect(jsonPath("$.message").value("Банковская карточка успешно заблокирована!"));
     }
 
     @Test
@@ -126,7 +126,7 @@ class CardControllerImplTest {
 
         mvc.perform(patch("/api/v1/cards/activate/4"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Банковская кароточка успещно активирована!"));
+                .andExpect(jsonPath("$.message").value("Банковская карточка успешно активирована!"));
     }
 
     @Test
@@ -135,7 +135,7 @@ class CardControllerImplTest {
 
         mvc.perform(delete("/api/v1/cards/42"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Банковская кароточка успещно удалена!"));
+                .andExpect(jsonPath("$.message").value("Банковская карточка успешно удалена!"));
     }
 
     @Test

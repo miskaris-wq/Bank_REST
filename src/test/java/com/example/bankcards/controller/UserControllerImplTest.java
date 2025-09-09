@@ -64,7 +64,7 @@ class UserControllerImplTest {
                 .andExpect(jsonPath("$.data.content[0].username").value("user1"))
                 .andExpect(jsonPath("$.data.content[0].password").value("pass1"))
                 .andExpect(jsonPath("$.data.content[0].roles").value("USER"))
-                .andExpect(jsonPath("$.message").value("Пользователи успешно вовзращены"));
+                .andExpect(jsonPath("$.message").value("Пользователи успешно возвращены"));
     }
 
     @Test
@@ -81,7 +81,7 @@ class UserControllerImplTest {
                 .andExpect(jsonPath("$.data.username").value("user2"))
                 .andExpect(jsonPath("$.data.password").value("pass2"))
                 .andExpect(jsonPath("$.data.roles").value("ADMIN"))
-                .andExpect(jsonPath("$.message").value("Пользователи успешно вовзращены"));
+                .andExpect(jsonPath("$.message").value("Пользователь успешно возвращен"));
     }
 
     @Test
@@ -100,7 +100,7 @@ class UserControllerImplTest {
                 .andExpect(jsonPath("$.data.username").value("updatedUser"))
                 .andExpect(jsonPath("$.data.password").value("newPass"))
                 .andExpect(jsonPath("$.data.roles").value("USER"))
-                .andExpect(jsonPath("$.message").value("Пользователи успешно обновлён"));
+                .andExpect(jsonPath("$.message").value("Пользователь успешно обновлён"));
     }
 
     @Test
