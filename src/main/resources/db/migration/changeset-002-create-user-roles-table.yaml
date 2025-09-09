@@ -1,0 +1,34 @@
+databaseChangeLog:
+  - changeSet:
+      id: "2"
+      author: "ksenya"
+      changes:
+        - createTable:
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: user_roles
+            columnNames: user_id,role
+            constraintName: pk_user_roles
+        - addForeignKeyConstraint:
+            baseTableName: user_roles
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_user_roles_user_id
+        - sql:
+            dbms: postgresql
+            sql: >
+              ALTER TABLE user_roles
+              ADD CONSTRAINT chk_user_roles_role
+              CHECK (role IN ('USER','ADMIN'));

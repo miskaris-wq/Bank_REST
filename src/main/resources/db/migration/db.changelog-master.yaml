@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - include:
+      file: changeset-001-create-users-table.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changeset-002-create-user-roles-table.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changeset-003-create-bank-card-table.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changeset-004-create-transfers-table.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changeset-005-create-blockrequest-table.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changeset-006-insert-users.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changeset-007-insert-user-roles.yaml
+      relativeToChangelogFile: true
+

@@ -15,6 +15,6 @@ public class TransferResponse {
     Long fromCardId;
     Long toCardId;
     BigDecimal amount;
-    String status;
+    String status; // status: COMPLETED | PROCESS | CANCELLED
     OffsetDateTime createdAt;
 }

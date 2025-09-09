@@ -1,9 +1,60 @@
-# 
-# docker-compose.yml — определяет сервисы для разработки и тестирования.
+version: '3.8'
 
-Что нужно сделать:
-  - Настроить сервисы для:
-      - PostgreSQL (или MySQL) с начальной базой.
-      - Приложения Spring Boot (если нужно).
-  - Открыть нужные порты (например, 5432, 8080).
-  - Настроить volume для хранения данных БД.
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: BankRest
+      POSTGRES_PASSWORD: BankRest
+      POSTGRES_DB: BankRest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - bank-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - bank-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bank-rest-app
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "8060:8060"
+    environment:
+      CARD_SECRET: "TXlTdXBlcktleUNhcmRGb3JCYW5rc2xz"
+      JWT_SECRET: "bf7c68b9cade5c7dd4524e955cb15710fe51d0c8d5933a6747d5ed77147da465b61d33ea11fa6f8983e4b8d81c2c8fc7ca72c4ea1dfca4835a6ad2f25d"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/BankRest
+      SPRING_DATASOURCE_USERNAME: BankRest
+      SPRING_DATASOURCE_PASSWORD: BankRest
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+    networks:
+      - bank-network
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+
+networks:
+  bank-network:
+    driver: bridge

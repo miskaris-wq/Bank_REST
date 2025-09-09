@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: "6"
+      author: "ksenya"
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: username
+                  value: "admin"
+              - column:
+                  name: password
+                  value: "admin"
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 2
+              - column:
+                  name: username
+                  value: "user"
+              - column:
+                  name: password
+                  value: "user"
