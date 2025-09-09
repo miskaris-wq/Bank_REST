@@ -1,7 +1,6 @@
 package com.example.bankcards.controller;
 
 import com.example.bankcards.dto.card.*;
-import com.example.bankcards.entity.*;
 import com.example.bankcards.entity.card.Card;
 import com.example.bankcards.entity.card.CardStatus;
 import com.example.bankcards.mapper.CardMapper;

@@ -2,7 +2,6 @@ package com.example.bankcards.service;
 
 import com.example.bankcards.dto.card.CardCreateRequest;
 import com.example.bankcards.dto.card.CardFilterRequest;
-import com.example.bankcards.entity.*;
 import com.example.bankcards.entity.card.Card;
 import com.example.bankcards.entity.card.CardStatus;
 import com.example.bankcards.entity.user.User;

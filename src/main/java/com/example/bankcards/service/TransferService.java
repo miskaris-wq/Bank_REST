@@ -1,7 +1,6 @@
 package com.example.bankcards.service;
 
 import com.example.bankcards.dto.transfer.TransferRequest;
-import com.example.bankcards.entity.*;
 import com.example.bankcards.entity.card.Card;
 import com.example.bankcards.entity.card.CardStatus;
 import com.example.bankcards.entity.transfer.CardTransfer;

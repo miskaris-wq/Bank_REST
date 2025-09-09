@@ -1,7 +1,6 @@
 package com.example.bankcards.service;
 
 import com.example.bankcards.dto.block.BlockRequestCreate;
-import com.example.bankcards.entity.*;
 import com.example.bankcards.entity.block.BlockRequestStatus;
 import com.example.bankcards.entity.block.CardBlockRequest;
 import com.example.bankcards.entity.card.Card;
