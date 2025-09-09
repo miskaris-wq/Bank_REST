@@ -6,9 +6,9 @@ services:
     container_name: postgres_db
     restart: always
     environment:
-      POSTGRES_USER: BankRest
-      POSTGRES_PASSWORD: BankRest
-      POSTGRES_DB: BankRest
+      POSTGRES_USER: bankrest
+      POSTGRES_PASSWORD: bankrest
+      POSTGRES_DB: bankrest
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -41,13 +41,20 @@ services:
     ports:
       - "8060:8060"
     environment:
-      CARD_SECRET: "TXlTdXBlcktleUNhcmRGb3JCYW5rc2xz"
-      JWT_SECRET: "bf7c68b9cade5c7dd4524e955cb15710fe51d0c8d5933a6747d5ed77147da465b61d33ea11fa6f8983e4b8d81c2c8fc7ca72c4ea1dfca4835a6ad2f25d"
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/BankRest
-      SPRING_DATASOURCE_USERNAME: BankRest
-      SPRING_DATASOURCE_PASSWORD: BankRest
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: "true"
+      # БД для приложения в контейнере: host = postgres (имя сервиса)
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bankrest
+      SPRING_DATASOURCE_USERNAME: bankrest
+      SPRING_DATASOURCE_PASSWORD: bankrest
+
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      SPRING_JPA_SHOW_SQL: "false"
+
+      JWT_SECRET: "f76295d1b072ce49e8808caf82091dd8b8e2451516996e217d3d7547fd7dae6e"
+      JWT_EXPIRATION: "3600000"
+      CARD_SECRET: "vOL6szZ0sHYzZJx5XZArG8VUla9viG0BXgiAo7Pooas="
+
+      SERVER_PORT: "8060"
+
     networks:
       - bank-network
 
