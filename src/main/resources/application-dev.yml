@@ -1,21 +1,20 @@
-server:
-  port: 8060
-
 spring:
   application:
     name: BankRest
   datasource:
-    url: jdbc:postgresql://localhost:5432/bankrest
-    username: bankrest
-    password: bankrest
+    url: jdbc:postgresql://localhost:5432/BankRest
+    username: BankRest
+    password: BankRest
     driver-class-name: org.postgresql.Driver
   jpa:
-    open-in-view: false
     show-sql: true
+    database: postgresql
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   liquibase:
-    enabled: true
     change-log: classpath:db/migration/db.changelog-master.yaml
   web:
     resources:
@@ -24,14 +23,26 @@ spring:
         - file:docs/
       static-path-pattern: /docs/**
 
+server:
+  port: 8060
+
 auth:
   jwt:
     secret: ${JWT_SECRET:f76295d1b072ce49e8808caf82091dd8b8e2451516996e217d3d7547fd7dae6e}
-    expiration: ${JWT_EXPIRATION:3600000}
+    expiration: 3600000
 
 card:
   secretKey: ${CARD_SECRET:vOL6szZ0sHYzZJx5XZArG8VUla9viG0BXgiAo7Pooas=}
 
 springdoc:
-  api-docs.enabled: true
-  swagger-ui.enabled: true
+  swagger-ui:
+    url: /v3/api-docs.yaml
+
+liquibase:
+  change-log: classpath:db/migration/db.changelog-master.yaml
+  contexts: development, production
+  default-schema: public
+  drop-first: false
+  enabled: true
+
+

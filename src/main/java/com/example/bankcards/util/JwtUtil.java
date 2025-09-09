@@ -1,4 +1,4 @@
-package com.example.bankcards.security;
+package com.example.bankcards.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -22,14 +22,14 @@ public class JwtUtil {
     private final long expirationMinutes;
 
     public JwtUtil(
-            @Value("${app.security.jwt-secret}") String secret,
-            @Value("${app.security.jwt-expiration-min:60}") long expirationMinutes
+            @Value("${auth.jwt.secret}") String secret,
+            @Value("${auth.jwt.expiration:3600000}") long expirationMs // мс! если хочешь в минутах — переименуй свойство
     ) {
         if (secret == null || secret.getBytes(StandardCharsets.UTF_8).length < 32) {
-            throw new IllegalStateException("app.security.jwt-secret must be at least 32 bytes");
+            throw new IllegalStateException("auth.jwt.secret must be at least 32 bytes");
         }
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        this.expirationMinutes = expirationMinutes;
+        this.expirationMinutes = expirationMs / 60_000L; // чтобы ниже считать в минутах
     }
 
     public String generateToken(String username, List<String> roles) {
@@ -41,7 +41,7 @@ public class JwtUtil {
                 .claims(Map.of("roles", roles))
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(exp))
-                .signWith(key) // 0.12.x: алгоритм определяется по ключу (HS256 для HMAC-ключа)
+                .signWith(key) // в 0.12.x алгоритм выбирается по ключу (HS256 для HMAC)
                 .compact();
     }
 
@@ -57,16 +57,14 @@ public class JwtUtil {
     public boolean isTokenValid(String token, UserDetails user) {
         try {
             Claims claims = parseSigned(token).getPayload();
-            String username = claims.getSubject();
-            Date exp = claims.getExpiration();
-            return username.equals(user.getUsername()) && exp.after(new Date());
+            return user.getUsername().equals(claims.getSubject())
+                    && claims.getExpiration().after(new Date());
         } catch (RuntimeException e) {
             return false;
         }
     }
 
     private Jws<Claims> parseSigned(String token) {
-        // 0.12.x: parser() + verifyWith(key) + parseSignedClaims(...)
         return Jwts.parser()
                 .verifyWith(key)
                 .build()
