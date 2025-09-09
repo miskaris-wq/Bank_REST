@@ -1,75 +1,109 @@
 package com.example.bankcards.service;
 
-import com.example.bankcards.dto.transfer.TransferRequest;
-import com.example.bankcards.entity.card.Card;
-import com.example.bankcards.entity.card.CardStatus;
-import com.example.bankcards.entity.transfer.CardTransfer;
+import com.example.bankcards.dto.Requests.TransferUserRequest;
+import com.example.bankcards.dto.TransferUserDto;
+import com.example.bankcards.entity.bankcard.BankCard;
+import com.example.bankcards.entity.bankcard.Status;
+import com.example.bankcards.entity.transfer.Transfer;
 import com.example.bankcards.entity.transfer.TransferStatus;
+import com.example.bankcards.entity.user.User;
+import com.example.bankcards.exception.InactiveCardException;
+import com.example.bankcards.exception.ResourceNotFoundException;
+import com.example.bankcards.exception.TransferNotFoundException;
+import com.example.bankcards.mappers.TransferMapper;
 import com.example.bankcards.repository.CardRepository;
-import com.example.bankcards.repository.CardTransferRepository;
-import com.example.bankcards.util.ExpiryUtils;
-import com.example.bankcards.util.MoneyUtils;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
+import com.example.bankcards.repository.TransferRepository;
+import com.example.bankcards.repository.UserRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.YearMonth;
-import java.util.NoSuchElementException;
 
 @Service
-@RequiredArgsConstructor
 public class TransferService {
 
-    private final CardRepository cards;
-    private final CardTransferRepository transfers;
+    private final CardService cardService;
+    private final TransferMapper transferMapper;
+    private final TransferRepository transferRepository;
+    private final CardRepository cardRepository;
+    private final UserRepository userRepository;
+
+    public TransferService(CardService cardService, TransferMapper transferMapper, TransferRepository transferRepository, CardRepository cardRepository, UserRepository userRepository) {
+        this.cardService = cardService;
+        this.transferMapper = transferMapper;
+        this.transferRepository = transferRepository;
+        this.cardRepository = cardRepository;
+        this.userRepository = userRepository;
+    }
 
     @Transactional
-    public CardTransfer transfer(Long userId, TransferRequest req) {
-        if (req.getFromId().equals(req.getToId())) {
-            throw new IllegalArgumentException("Cannot transfer to the same card");
-        }
-        MoneyUtils.requirePositive(req.getAmount());
-        BigDecimal amount = MoneyUtils.normalize(req.getAmount());
+    @CacheEvict(value = "allTransfers", allEntries = true)
+    public TransferUserDto transferFromToCardUser(Long userId, TransferUserRequest request) {
+        Long fromCardId = request.getFromCardId();
+        Long toCardId   = request.getToCardId();
+        BigDecimal amount = request.getAmount();
 
-        Card from = cards.findByIdAndOwnerId(req.getFromId(), userId)
-                .orElseThrow(() -> new NoSuchElementException("Source card not found"));
-        Card to = cards.findByIdAndOwnerId(req.getToId(), userId)
-                .orElseThrow(() -> new NoSuchElementException("Target card not found"));
+        BankCard fromCard = cardRepository.findById(fromCardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Карта-отправитель не найдена"));
+        BankCard toCard   = cardRepository.findById(toCardId)
+                .orElseThrow(() -> new ResourceNotFoundException("Карта-получатель не найдена"));
 
-        requireActiveAndNotExpired(from);
-        requireActiveAndNotExpired(to);
-
-        if (from.getBalance().compareTo(amount) < 0) {
-            throw new IllegalStateException("Insufficient funds");
+        if(!(fromCard.getStatus().equals(Status.ACTIVE) && toCard.getStatus().equals(Status.ACTIVE))){
+            throw new InactiveCardException("Обе карты должны быть актевированы");
         }
 
-        CardTransfer t = new CardTransfer();
-        t.setFromCard(from);
-        t.setToCard(to);
-        t.setAmount(amount);
-        t.setStatus(TransferStatus.PROCESS);
-        t = transfers.save(t);
+        User initiator    = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Пользователь не найден"));
 
-        from.setBalance(MoneyUtils.normalize(from.getBalance().subtract(amount)));
-        to.setBalance(MoneyUtils.normalize(to.getBalance().add(amount)));
+        Transfer transfer = Transfer.builder()
+                .fromCard(fromCard)
+                .toCard(toCard)
+                .initiator(initiator)
+                .amount(amount)
+                .build();
 
-        t.setStatus(TransferStatus.COMPLETED);
-        return t;
+        transfer = transferRepository.save(transfer);
+
+        try {
+            cardService.withdraw(fromCardId, amount);
+            cardService.deposit(toCardId, amount);
+            transfer.setStatus(TransferStatus.COMPLETED);
+        } catch (RuntimeException ex) {
+            transfer.setStatus(TransferStatus.CANCELLED);
+            transferRepository.save(transfer);
+            throw ex;
+        }
+
+        transfer = transferRepository.save(transfer);
+        return transferMapper.toDto(transfer);
     }
 
-    public Page<CardTransfer> historyForUser(Long userId, Pageable pageable) {
-        return transfers.findAllForUser(userId, pageable);
+    @Cacheable(value = "allTransfers", key = "#pageNumber + '-' + #pageSize")
+    public Page<TransferUserDto> getAll(int pageNumber, int pageSize) {
+
+        Page<Transfer> transfers = transferRepository.findAll(PageRequest.of(pageNumber, pageSize));
+
+        return transfers.map(transferMapper::toDto);
     }
 
-    private void requireActiveAndNotExpired(Card c) {
-        if (c.getStatus() != CardStatus.ACTIVE) {
-            throw new IllegalStateException("Card must be ACTIVE");
-        }
-        YearMonth ym = YearMonth.parse(c.getExpiry());
-        if (ExpiryUtils.isExpired(ym)) {
-            throw new IllegalStateException("Card is expired");
-        }
+    @Cacheable(value = "transfer", key = "#id")
+    public TransferUserDto getById(Long id) {
+
+        Transfer transfer = transferRepository.findById(id)
+                .orElseThrow(() -> new TransferNotFoundException(String.format("Перевода с id %d не найден", id)));
+
+        return transferMapper.toDto(transfer);
+    }
+
+    @Cacheable(value = "allTransfersUser", key = "#pageNumber + '-' + #pageSize + '-' + #userId")
+    public Page<TransferUserDto> getAllByUser(int pageNumber, int pageSize, Long userId) {
+
+        Page<Transfer> transfers = transferRepository.findAllByInitiatorId(userId,PageRequest.of(pageNumber, pageSize));
+
+        return transfers.map(transferMapper::toDto);
     }
 }

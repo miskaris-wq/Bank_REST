@@ -36,7 +36,12 @@ card:
 
 springdoc:
   swagger-ui:
+    path: /swagger-ui.html
     url: /v3/api-docs.yaml
+    enabled: true
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
 
 liquibase:
   change-log: classpath:db/migration/db.changelog-master.yaml
