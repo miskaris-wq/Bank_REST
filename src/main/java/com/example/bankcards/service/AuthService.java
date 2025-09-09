@@ -40,7 +40,7 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    //@Cacheable(cacheNames = "login", key = "#request.userName")
+    @Cacheable(cacheNames = "login", key = "#request.userName")
     public JwtDTO login(LoginRequest request){
         if(request.getUserName() == null && request.getPassword() == null){
             throw new MissingCredentialsException("Отстутвует логин или пароль");
@@ -65,7 +65,7 @@ public class AuthService {
                 .build();
     }
 
-    //@Cacheable(cacheNames = "register", key = "#request.userName")
+    @Cacheable(cacheNames = "register", key = "#request.userName")
     public JwtDTO register(RegisterRequest request) {
         if(request.getUserName() == null && request.getPassword() == null){
             throw new MissingCredentialsException("Отстутвует логин или пароль");
