@@ -1,7 +1,7 @@
 package com.example.bankcards.service.impl;
 
 import com.example.bankcards.dto.BankCardDTO;
-import com.example.bankcards.dto.CardBalanceDto;
+import com.example.bankcards.dto.CardBalanceDTO;
 import com.example.bankcards.dto.TotalCardBalanceDTO;
 import com.example.bankcards.dto.UserDTO;
 import com.example.bankcards.entity.user.User;

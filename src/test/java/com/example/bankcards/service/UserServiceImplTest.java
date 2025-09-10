@@ -1,6 +1,6 @@
 package com.example.bankcards.service;
 
-import com.example.bankcards.dto.CardBalanceDto;
+import com.example.bankcards.dto.CardBalanceDTO;
 import com.example.bankcards.dto.UserDTO;
 import com.example.bankcards.entity.user.Role;
 import com.example.bankcards.entity.user.User;
@@ -48,7 +48,7 @@ class UserServiceImplTest {
 
     private User user;
     private UserDTO userDto;
-    private CardBalanceDto balanceDto;
+    private CardBalanceDTO balanceDto;
 
     @BeforeEach
     void setUp() {
@@ -57,14 +57,14 @@ class UserServiceImplTest {
         user.setUsername("user");
         user.setRoles(Set.of(Role.ADMIN));
         userDto = new UserDTO();
-        balanceDto = new CardBalanceDto();
+        balanceDto = new CardBalanceDTO();
         balanceDto.setBalance(java.math.BigDecimal.ZERO);
         user = new User();
         user.setId(1L);
         user.setUsername("user");
         user.setRoles(Set.of(Role.ADMIN));
         userDto = new UserDTO();
-        balanceDto = new CardBalanceDto();
+        balanceDto = new CardBalanceDTO();
     }
 
     @Test

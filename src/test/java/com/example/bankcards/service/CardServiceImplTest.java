@@ -1,7 +1,7 @@
 package com.example.bankcards.service;
 
 import com.example.bankcards.dto.BankCardDTO;
-import com.example.bankcards.dto.CardBalanceDto;
+import com.example.bankcards.dto.CardBalanceDTO;
 import com.example.bankcards.dto.Requests.CreateCardRequest;
 import com.example.bankcards.entity.bankcard.BankCard;
 import com.example.bankcards.entity.bankcard.Status;
@@ -70,7 +70,7 @@ class CardServiceImplTest {
     private User user;
     private BankCard card;
     private BankCardDTO cardDto;
-    private CardBalanceDto balanceDto;
+    private CardBalanceDTO balanceDto;
 
     @BeforeEach
     void setUp() {
@@ -79,7 +79,7 @@ class CardServiceImplTest {
         card.setId(2L);
         card.setStatus(Status.BLOCKED);
         cardDto = new BankCardDTO();
-        balanceDto = new CardBalanceDto();
+        balanceDto = new CardBalanceDTO();
     }
 
     @Test
@@ -233,7 +233,7 @@ class CardServiceImplTest {
         when(cardRepository.findById(2L)).thenReturn(Optional.of(card));
         when(cardRepository.save(card)).thenReturn(card);
         when(bankCardBalanceMapper.toDto(card)).thenReturn(balanceDto);
-        CardBalanceDto result = cardServiceImpl.withdraw(2L, BigDecimal.valueOf(50));
+        CardBalanceDTO result = cardServiceImpl.withdraw(2L, BigDecimal.valueOf(50));
         assertThat(result).isEqualTo(balanceDto);
     }
 
@@ -268,7 +268,7 @@ class CardServiceImplTest {
         when(cardRepository.findById(2L)).thenReturn(Optional.of(card));
         when(cardRepository.save(card)).thenReturn(card);
         when(bankCardBalanceMapper.toDto(card)).thenReturn(balanceDto);
-        CardBalanceDto result = cardServiceImpl.deposit(2L, BigDecimal.valueOf(50));
+        CardBalanceDTO result = cardServiceImpl.deposit(2L, BigDecimal.valueOf(50));
         assertThat(result).isEqualTo(balanceDto);
     }
 
@@ -285,7 +285,7 @@ class CardServiceImplTest {
         when(cardRepository.findAllByOwnerIdAndId(1L,2L))
                 .thenReturn(Optional.of(card));
         when(bankCardBalanceMapper.toDto(card)).thenReturn(balanceDto);
-        CardBalanceDto result = cardServiceImpl.getBalance(1L,2L);
+        CardBalanceDTO result = cardServiceImpl.getBalance(1L,2L);
         assertThat(result).isEqualTo(balanceDto);
     }
 

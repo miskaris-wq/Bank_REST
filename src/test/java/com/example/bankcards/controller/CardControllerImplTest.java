@@ -2,7 +2,7 @@ package com.example.bankcards.controller;
 
 import com.example.bankcards.controller.impl.CardControllerImpl;
 import com.example.bankcards.dto.BankCardDTO;
-import com.example.bankcards.dto.CardBalanceDto;
+import com.example.bankcards.dto.CardBalanceDTO;
 import com.example.bankcards.dto.Requests.CreateCardRequest;
 import com.example.bankcards.dto.Requests.ReplenishRequest;
 import com.example.bankcards.security.JwtComponent;
@@ -142,7 +142,7 @@ class CardControllerImplTest {
     @Test
     @DisplayName("GET /api/v1/cards/balance/{cardId}/user/{userId} → 200 + баланс")
     void getBalance_Success() throws Exception {
-        CardBalanceDto bal = CardBalanceDto.builder().balance(BigDecimal.valueOf(123.45)).build();
+        CardBalanceDTO bal = CardBalanceDTO.builder().balance(BigDecimal.valueOf(123.45)).build();
         given(cardServiceImpl.getBalance(77L, 88L)).willReturn(bal);
 
         mvc.perform(get("/api/v1/cards/balance/88/user/77"))
@@ -154,7 +154,7 @@ class CardControllerImplTest {
     @DisplayName("POST /api/v1/cards/replenish/{id} → 200 + пополнение")
     void replenish_Success() throws Exception {
         ReplenishRequest req = ReplenishRequest.builder().amount(BigDecimal.TEN).build();
-        CardBalanceDto bal = CardBalanceDto.builder().balance(BigDecimal.valueOf(10)).build();
+        CardBalanceDTO bal = CardBalanceDTO.builder().balance(BigDecimal.valueOf(10)).build();
         given(cardServiceImpl.deposit(90L, BigDecimal.TEN)).willReturn(bal);
 
         mvc.perform(post("/api/v1/cards/replenish/90")

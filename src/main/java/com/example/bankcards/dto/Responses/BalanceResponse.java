@@ -1,11 +1,11 @@
 package com.example.bankcards.dto.Responses;
 
-import com.example.bankcards.dto.CardBalanceDto;
+import com.example.bankcards.dto.CardBalanceDTO;
 import org.springframework.http.HttpStatus;
 
-public class BalanceResponse extends Response<CardBalanceDto>{
+public class BalanceResponse extends Response<CardBalanceDTO>{
 
-    public BalanceResponse(CardBalanceDto balance, String message, HttpStatus status) {
+    public BalanceResponse(CardBalanceDTO balance, String message, HttpStatus status) {
         super(balance, message, status);
     }
 }

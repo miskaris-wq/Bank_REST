@@ -2,7 +2,7 @@ package com.example.bankcards.controller.impl;
 
 import com.example.bankcards.controller.interfaces.CardController;
 import com.example.bankcards.dto.BankCardDTO;
-import com.example.bankcards.dto.CardBalanceDto;
+import com.example.bankcards.dto.CardBalanceDTO;
 import com.example.bankcards.dto.Requests.CreateCardRequest;
 import com.example.bankcards.dto.Requests.ReplenishRequest;
 import com.example.bankcards.dto.Responses.*;
@@ -70,14 +70,14 @@ public class CardControllerImpl implements CardController {
 
     @Override
     public ResponseEntity<BalanceResponse> getBalance(Long userId, Long cardId) {
-        CardBalanceDto balance = cardServiceImpl.getBalance(userId, cardId);
+        CardBalanceDTO balance = cardServiceImpl.getBalance(userId, cardId);
         BalanceResponse response = new BalanceResponse(balance, "Баланс карты получен", HttpStatus.OK);
         return ResponseEntity.ok(response);
     }
 
     @Override
     public ResponseEntity<BalanceResponse> replenish(Long id, ReplenishRequest request) {
-        CardBalanceDto updatedBalance = cardServiceImpl.deposit(id, request.getAmount());
+        CardBalanceDTO updatedBalance = cardServiceImpl.deposit(id, request.getAmount());
         BalanceResponse response = new BalanceResponse(updatedBalance, "Баланс успешно пополнен", HttpStatus.OK);
         return ResponseEntity.ok(response);
     }

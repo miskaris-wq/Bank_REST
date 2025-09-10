@@ -1,7 +1,7 @@
 package com.example.bankcards.service.impl;
 
 import com.example.bankcards.dto.BankCardDTO;
-import com.example.bankcards.dto.CardBalanceDto;
+import com.example.bankcards.dto.CardBalanceDTO;
 import com.example.bankcards.dto.Requests.CreateCardRequest;
 import com.example.bankcards.entity.bankcard.BankCard;
 import com.example.bankcards.entity.bankcard.Status;
@@ -143,7 +143,7 @@ public class CardServiceImpl implements CardService {
     @Override
     @Transactional
     @CacheEvict(value = {"bankCardsUser", "bankCardsUserAll", "bankCards"}, allEntries = true)
-    public CardBalanceDto withdraw(Long cardId, BigDecimal amount) {
+    public CardBalanceDTO withdraw(Long cardId, BigDecimal amount) {
         BankCard card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new CardNotFoundException("Карта с ID " + cardId + " не найдена"));
 
@@ -162,7 +162,7 @@ public class CardServiceImpl implements CardService {
     @Override
     @Transactional
     @CacheEvict(value = {"bankCardsUser", "bankCardsUserAll", "bankCards"}, allEntries = true)
-    public CardBalanceDto deposit(Long cardId, BigDecimal amount) {
+    public CardBalanceDTO deposit(Long cardId, BigDecimal amount) {
         BankCard card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new CardNotFoundException("Карта с ID " + cardId + " не найдена"));
 
@@ -176,7 +176,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public CardBalanceDto getBalance(Long userId, Long cardId) {
+    public CardBalanceDTO getBalance(Long userId, Long cardId) {
         BankCard card = cardRepository.findAllByOwnerIdAndId(userId, cardId)
                 .orElseThrow(() -> new CardNotFoundException("У пользователя с ID " + userId + " нет карты с ID " + cardId));
         return bankCardBalanceMapper.toDto(card);

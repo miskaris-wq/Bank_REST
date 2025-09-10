@@ -10,6 +10,6 @@ import java.util.List;
 @Builder
 public class TotalCardBalanceDTO {
     private Long userId;
-    private List<CardBalanceDto> cardBalances;
+    private List<CardBalanceDTO> cardBalances;
     private BigDecimal totalBalance;
 }

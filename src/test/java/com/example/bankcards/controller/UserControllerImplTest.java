@@ -1,7 +1,7 @@
 package com.example.bankcards.controller;
 
 import com.example.bankcards.controller.impl.UserControllerImpl;
-import com.example.bankcards.dto.CardBalanceDto;
+import com.example.bankcards.dto.CardBalanceDTO;
 import com.example.bankcards.dto.TotalCardBalanceDTO;
 import com.example.bankcards.dto.UserDTO;
 import com.example.bankcards.entity.user.Role;
@@ -115,7 +115,7 @@ class UserControllerImplTest {
     @Test
     @DisplayName("GET /api/v1/user/{userId}/total-balance → 200 OK + total balance")
     void getTotalBalance_Success() throws Exception {
-        CardBalanceDto cbd = CardBalanceDto.builder().balance(BigDecimal.valueOf(100)).cardId(1L).build();
+        CardBalanceDTO cbd = CardBalanceDTO.builder().balance(BigDecimal.valueOf(100)).cardId(1L).build();
         TotalCardBalanceDTO total = TotalCardBalanceDTO.builder()
                 .userId(5L)
                 .cardBalances(List.of(cbd))

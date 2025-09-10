@@ -1,7 +1,7 @@
 package com.example.bankcards.service.interfaces;
 
 import com.example.bankcards.dto.BankCardDTO;
-import com.example.bankcards.dto.CardBalanceDto;
+import com.example.bankcards.dto.CardBalanceDTO;
 import com.example.bankcards.dto.Requests.CreateCardRequest;
 import com.example.bankcards.entity.bankcard.BankCard;
 import com.example.bankcards.entity.bankcard.Status;
@@ -32,11 +32,11 @@ public interface CardService {
 
     boolean isOwnerCard(Long userId, Long cardId);
 
-    CardBalanceDto withdraw(Long cardId, BigDecimal amount);
+    CardBalanceDTO withdraw(Long cardId, BigDecimal amount);
 
-    CardBalanceDto deposit(Long cardId, BigDecimal amount);
+    CardBalanceDTO deposit(Long cardId, BigDecimal amount);
 
-    CardBalanceDto getBalance(Long userId, Long cardId);
+    CardBalanceDTO getBalance(Long userId, Long cardId);
 
     boolean isActivated(BankCard bankCard);
 }

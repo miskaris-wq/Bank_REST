@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CardBalanceDto {
+public class CardBalanceDTO {
     private Long cardId;
     private BigDecimal balance;
     private String maskedCardNumber;
