@@ -8,6 +8,7 @@ import com.example.bankcards.dto.Responses.UsersResponse;
 import com.example.bankcards.dto.TotalCardBalanceDTO;
 import com.example.bankcards.dto.UserDTO;
 import com.example.bankcards.service.impl.UserServiceImpl;
+import com.example.bankcards.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor // ← Для инъекции зависимостей
 public class UserControllerImpl implements UserController {
 
-    private final UserServiceImpl userServiceImpl;
+    private final UserService userServiceImpl;
 
     @Override
     @GetMapping("/all")

@@ -4,11 +4,14 @@ import com.example.bankcards.dto.BankCardDTO;
 import com.example.bankcards.dto.CardBalanceDTO;
 import com.example.bankcards.dto.TotalCardBalanceDTO;
 import com.example.bankcards.dto.UserDTO;
+import com.example.bankcards.entity.bankcard.BankCard;
 import com.example.bankcards.entity.user.User;
 import com.example.bankcards.exception.CardNotFoundException;
 import com.example.bankcards.exception.CustomUserNotFoundException;
 import com.example.bankcards.mappers.BankCardBalanceMapper;
+import com.example.bankcards.mappers.BankCardMapper;
 import com.example.bankcards.mappers.UserMapper;
+import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +35,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final BankCardBalanceMapper bankCardBalanceMapper;
     private final PasswordEncoder passwordEncoder;
-    private final CardServiceImpl cardServiceImpl;
+    private final CardRepository cardRepository;
 
     @Override
     @Cacheable(cacheNames = "user", key = "#username")
@@ -74,7 +77,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new CustomUserNotFoundException(
                         "Пользователь с id=" + id + " не найден"
                 ));
-
         return userMapper.toDto(user);
     }
 
@@ -86,17 +88,18 @@ public class UserServiceImpl implements UserService {
                         "Пользователь с id=" + userId + " не найден"
                 ));
 
-        List<BankCardDTO> cards = cardServiceImpl.getAllCurrentUser();
-        List<CardBalanceDto> balances = cards.stream()
-                .map(bankCardBalanceMapper::toDto)
-                .toList();
+        List<BankCard> cards = cardRepository.findAllByOwnerId(userId);
 
-        if (balances.isEmpty()) {
+        if (cards.isEmpty()) {
             throw new CardNotFoundException("Нет карт для расчёта баланса у пользователя id=" + userId);
         }
 
+        List<CardBalanceDTO> balances = cards.stream()
+                .map(bankCardBalanceMapper::toDto)
+                .toList();
+
         BigDecimal total = balances.stream()
-                .map(CardBalanceDto::getBalance)
+                .map(CardBalanceDTO::getBalance)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return TotalCardBalanceDTO.builder()

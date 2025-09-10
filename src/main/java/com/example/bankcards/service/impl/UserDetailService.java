@@ -1,20 +1,23 @@
 package com.example.bankcards.service.impl;
 
+import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.security.MyUserDetails;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserDetailService implements UserDetailsService {
 
-    private final UserServiceImpl userServiceImpl;
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return new MyUserDetails(userServiceImpl.getUserByUsername(username));
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден: " + username));
+        return new MyUserDetails(user);
     }
 }

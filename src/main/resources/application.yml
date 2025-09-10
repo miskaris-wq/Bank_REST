@@ -2,12 +2,12 @@ spring:
   application:
     name: BankRest
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/BankRest}
+    username: ${SPRING_DATASOURCE_USERNAME:BankRest}
+    password: ${SPRING_DATASOURCE_PASSWORD:BankRest}
     driver-class-name: org.postgresql.Driver
   jpa:
-    show-sql: ${SPRING_JPA_SHOW_SQL}
+    show-sql: ${SPRING_JPA_SHOW_SQL:true}
     database: postgresql
     hibernate:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
@@ -28,11 +28,11 @@ server:
 
 auth:
   jwt:
-    secret: ${JWT_SECRET}
+    secret: ${JWT_SECRET:f76295d1b072ce49e8808caf82091dd8b8e2451516996e217d3d7547fd7dae6e}
     expiration: 3600000
 
 card:
-  secretKey: ${CARD_SECRET}
+  secretKey: ${CARD_SECRET:vOL6szZ0sHYzZJx5XZArG8VUla9viG0BXgiAo7Pooas=}
 
 springdoc:
   swagger-ui:

@@ -11,6 +11,7 @@ import com.example.bankcards.mappers.BankCardBalanceMapper;
 import com.example.bankcards.mappers.BankCardMapper;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
+import com.example.bankcards.service.interfaces.CardRequestService;
 import com.example.bankcards.service.interfaces.CardService;
 import com.example.bankcards.util.CardEncryptionUtil;
 import com.example.bankcards.util.CardNumberGenerator;
@@ -35,7 +36,7 @@ public class CardServiceImpl implements CardService {
     private final BankCardBalanceMapper bankCardBalanceMapper;
     private final CardEncryptionUtil cardEncryptionUtil;
     private final UserServiceImpl userServiceImpl;
-    private final CardRequestServiceImpl cardRequestServiceImpl;
+    private final CardRequestService cardRequestServiceImpl;
 
     @Override
     @Transactional

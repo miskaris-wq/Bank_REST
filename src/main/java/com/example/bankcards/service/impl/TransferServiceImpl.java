@@ -14,6 +14,7 @@ import com.example.bankcards.mappers.TransferMapper;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.TransferRepository;
 import com.example.bankcards.repository.UserRepository;
+import com.example.bankcards.service.interfaces.CardService;
 import com.example.bankcards.service.interfaces.TransferService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -29,7 +30,7 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class TransferServiceImpl implements TransferService {
 
-    private final CardServiceImpl cardServiceImpl;
+    private final CardService cardServiceImpl;
     private final TransferMapper transferMapper;
     private final TransferRepository transferRepository;
     private final CardRepository cardRepository;

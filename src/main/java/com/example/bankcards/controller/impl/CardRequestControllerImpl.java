@@ -5,6 +5,7 @@ import com.example.bankcards.dto.CardRequestDTO;
 import com.example.bankcards.dto.Responses.CardRequestResponse;
 import com.example.bankcards.dto.Responses.CardRequestsResponse;
 import com.example.bankcards.service.impl.CardRequestServiceImpl;
+import com.example.bankcards.service.interfaces.CardRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CardRequestControllerImpl implements CardRequestController {
 
-    private final CardRequestServiceImpl cardRequestServiceImpl;
+    private final CardRequestService cardRequestServiceImpl;
 
     @Override
     public ResponseEntity<CardRequestResponse> requestBlock(Long id) {

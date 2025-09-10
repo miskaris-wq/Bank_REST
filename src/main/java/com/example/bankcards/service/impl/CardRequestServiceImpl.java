@@ -10,6 +10,7 @@ import com.example.bankcards.mappers.CardRequestMapper;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.CardRequestRepository;
 import com.example.bankcards.service.interfaces.CardRequestService;
+import com.example.bankcards.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,7 +28,7 @@ public class CardRequestServiceImpl implements CardRequestService {
     private final CardRepository cardRepository;
     private final CardRequestRepository cardRequestRepository;
     private final CardRequestMapper cardRequestMapper;
-    private final UserServiceImpl userServiceImpl;
+    private final UserService userServiceImpl;
 
     @Override
     @Transactional

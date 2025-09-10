@@ -6,6 +6,7 @@ import com.example.bankcards.dto.Responses.TransferResponse;
 import com.example.bankcards.dto.Responses.TransfersResponse;
 import com.example.bankcards.dto.TransferUserDto;
 import com.example.bankcards.service.impl.TransferServiceImpl;
+import com.example.bankcards.service.interfaces.TransferService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class TransferControllerImpl implements TransferController {
 
-    private final TransferServiceImpl transferServiceImpl;
+    private final TransferService transferServiceImpl;
 
     @Override
     public ResponseEntity<TransferResponse> transfer(Long userId, TransferUserRequest request) {

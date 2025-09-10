@@ -8,6 +8,7 @@ import com.example.bankcards.dto.Requests.RegisterRequest;
 import com.example.bankcards.dto.Responses.JwtResponse;
 import com.example.bankcards.dto.Responses.Response;
 import com.example.bankcards.service.impl.AuthServiceImpl;
+import com.example.bankcards.service.interfaces.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AuthControllerImpl implements AuthController {
 
-    private final AuthServiceImpl authServiceImpl;
+    private final AuthService authServiceImpl;
 
     public AuthControllerImpl(AuthServiceImpl authServiceImpl) {
         this.authServiceImpl = authServiceImpl;
