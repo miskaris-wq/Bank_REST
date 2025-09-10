@@ -5,7 +5,6 @@ import com.example.bankcards.dto.Requests.TransferUserRequest;
 import com.example.bankcards.dto.Responses.TransferResponse;
 import com.example.bankcards.dto.Responses.TransfersResponse;
 import com.example.bankcards.dto.TransferUserDto;
-import com.example.bankcards.service.impl.TransferServiceImpl;
 import com.example.bankcards.service.interfaces.TransferService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

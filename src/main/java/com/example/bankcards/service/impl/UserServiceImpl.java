@@ -1,6 +1,5 @@
 package com.example.bankcards.service.impl;
 
-import com.example.bankcards.dto.BankCardDTO;
 import com.example.bankcards.dto.CardBalanceDTO;
 import com.example.bankcards.dto.TotalCardBalanceDTO;
 import com.example.bankcards.dto.UserDTO;
@@ -9,7 +8,6 @@ import com.example.bankcards.entity.user.User;
 import com.example.bankcards.exception.CardNotFoundException;
 import com.example.bankcards.exception.CustomUserNotFoundException;
 import com.example.bankcards.mappers.BankCardBalanceMapper;
-import com.example.bankcards.mappers.BankCardMapper;
 import com.example.bankcards.mappers.UserMapper;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;

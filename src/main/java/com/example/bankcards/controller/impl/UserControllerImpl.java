@@ -7,7 +7,6 @@ import com.example.bankcards.dto.Responses.UserResponse;
 import com.example.bankcards.dto.Responses.UsersResponse;
 import com.example.bankcards.dto.TotalCardBalanceDTO;
 import com.example.bankcards.dto.UserDTO;
-import com.example.bankcards.service.impl.UserServiceImpl;
 import com.example.bankcards.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,8 +17,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/user") // ← ДОБАВЬТЕ ЭТУ АННОТАЦИЮ
-@RequiredArgsConstructor // ← Для инъекции зависимостей
+@RequestMapping("/api/v1/user")
+@RequiredArgsConstructor
 public class UserControllerImpl implements UserController {
 
     private final UserService userServiceImpl;

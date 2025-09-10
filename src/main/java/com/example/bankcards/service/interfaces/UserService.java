@@ -5,8 +5,6 @@ import com.example.bankcards.dto.UserDTO;
 import com.example.bankcards.entity.user.User;
 import org.springframework.data.domain.Page;
 
-import java.util.List;
-
 public interface UserService {
     User getUserByUsername(String username);
 
