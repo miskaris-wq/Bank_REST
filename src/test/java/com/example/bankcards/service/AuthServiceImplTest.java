@@ -8,6 +8,7 @@ import com.example.bankcards.exception.InvalidCredentialsException;
 import com.example.bankcards.exception.MissingCredentialsException;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.security.JwtComponent;
+import com.example.bankcards.service.impl.AuthServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +34,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class AuthServiceTest {
+class AuthServiceImplTest {
 
     @Mock
     private AuthenticationManager authenticationManager;
@@ -48,7 +49,7 @@ class AuthServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    private AuthService authService;
+    private AuthServiceImpl authServiceImpl;
 
     @Captor
     private ArgumentCaptor<User> userCaptor;
@@ -69,7 +70,7 @@ class AuthServiceTest {
     @Test
     void login_Success() {
         LoginRequest request = new LoginRequest(USERNAME, PASSWORD);
-        JwtDTO result = authService.login(request);
+        JwtDTO result = authServiceImpl.login(request);
         verify(authenticationManager).authenticate(
                 new UsernamePasswordAuthenticationToken(USERNAME, PASSWORD)
         );
@@ -84,7 +85,7 @@ class AuthServiceTest {
         LoginRequest request = new LoginRequest(USERNAME, PASSWORD);
         doThrow(new AuthenticationException("Bad credentials") {}).when(authenticationManager)
                 .authenticate(any(UsernamePasswordAuthenticationToken.class));
-        assertThatThrownBy(() -> authService.login(request))
+        assertThatThrownBy(() -> authServiceImpl.login(request))
                 .isInstanceOf(InvalidCredentialsException.class)
                 .hasMessage("Неверные логин или пароль");
         verify(jwtComponent, org.mockito.Mockito.never()).generateJwtToken(any());
@@ -93,15 +94,15 @@ class AuthServiceTest {
     @Test
     void register_MissingCredentials() {
         RegisterRequest request = new RegisterRequest(null, null);
-        assertThatThrownBy(() -> authService.register(request))
+        assertThatThrownBy(() -> authServiceImpl.register(request))
                 .isInstanceOf(MissingCredentialsException.class)
-                .hasMessage("Отстутвует логин или пароль");
+                .hasMessage("Не указан логин или пароль");
     }
 
     @Test
     void register_Success() {
         RegisterRequest request = new RegisterRequest(USERNAME, PASSWORD);
-        JwtDTO result = authService.register(request);
+        JwtDTO result = authServiceImpl.register(request);
         verify(passwordEncoder).encode(PASSWORD);
         verify(userRepository).save(userCaptor.capture());
         User savedUser = userCaptor.getValue();

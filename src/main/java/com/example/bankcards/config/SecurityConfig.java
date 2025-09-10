@@ -5,7 +5,7 @@ import com.example.bankcards.security.RestAccessDeniedHandler;
 import com.example.bankcards.security.RestAuthenticationEntryPoint;
 import com.example.bankcards.security.SecurityConstants;
 import com.example.bankcards.security.filters.JwtAuthenticationFilter;
-import com.example.bankcards.service.UserDetailService;
+import com.example.bankcards.service.impl.UserDetailService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

@@ -1,4 +1,4 @@
-package com.example.bankcards.service;
+package com.example.bankcards.service.impl;
 
 import com.example.bankcards.security.MyUserDetails;
 import lombok.AllArgsConstructor;
@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class UserDetailService implements UserDetailsService {
 
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return new MyUserDetails(userService.getUserByUsername(username));
+        return new MyUserDetails(userServiceImpl.getUserByUsername(username));
     }
 }

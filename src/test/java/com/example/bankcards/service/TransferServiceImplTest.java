@@ -13,6 +13,8 @@ import com.example.bankcards.mappers.TransferMapper;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.TransferRepository;
 import com.example.bankcards.repository.UserRepository;
+import com.example.bankcards.service.impl.CardServiceImpl;
+import com.example.bankcards.service.impl.TransferServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,10 +38,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class TransferServiceTest {
+class TransferServiceImplTest {
 
     @Mock
-    private CardService cardService;
+    private CardServiceImpl cardServiceImpl;
 
     @Mock
     private TransferMapper transferMapper;
@@ -54,7 +56,7 @@ class TransferServiceTest {
     private UserRepository userRepository;
 
     @InjectMocks
-    private TransferService transferService;
+    private TransferServiceImpl transferServiceImpl;
 
     @Captor
     private ArgumentCaptor<Transfer> transferCaptor;
@@ -93,17 +95,17 @@ class TransferServiceTest {
         when(transferRepository.save(any())).thenReturn(transfer);
         when(transferMapper.toDto(transfer)).thenReturn(dto);
 
-        TransferUserDto result = transferService.transferFromToCardUser(3L, request);
+        TransferUserDto result = transferServiceImpl.transferFromToCardUser(3L, request);
 
-        verify(cardService).withdraw(1L, BigDecimal.valueOf(10));
-        verify(cardService).deposit(2L, BigDecimal.valueOf(10));
+        verify(cardServiceImpl).withdraw(1L, BigDecimal.valueOf(10));
+        verify(cardServiceImpl).deposit(2L, BigDecimal.valueOf(10));
         assertThat(result).isEqualTo(dto);
     }
 
     @Test
     void transferFromToCardUser_FromCardNotFound() {
         when(cardRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> transferService.transferFromToCardUser(3L, request))
+        assertThatThrownBy(() -> transferServiceImpl.transferFromToCardUser(3L, request))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
@@ -111,7 +113,7 @@ class TransferServiceTest {
     void transferFromToCardUser_ToCardNotFound() {
         when(cardRepository.findById(1L)).thenReturn(Optional.of(fromCard));
         when(cardRepository.findById(2L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> transferService.transferFromToCardUser(3L, request))
+        assertThatThrownBy(() -> transferServiceImpl.transferFromToCardUser(3L, request))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
@@ -120,7 +122,7 @@ class TransferServiceTest {
         toCard.setStatus(Status.BLOCKED);
         when(cardRepository.findById(1L)).thenReturn(Optional.of(fromCard));
         when(cardRepository.findById(2L)).thenReturn(Optional.of(toCard));
-        assertThatThrownBy(() -> transferService.transferFromToCardUser(3L, request))
+        assertThatThrownBy(() -> transferServiceImpl.transferFromToCardUser(3L, request))
                 .isInstanceOf(InactiveCardException.class);
     }
 
@@ -129,14 +131,14 @@ class TransferServiceTest {
         when(cardRepository.findById(1L)).thenReturn(Optional.of(fromCard));
         when(cardRepository.findById(2L)).thenReturn(Optional.of(toCard));
         when(userRepository.findById(3L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> transferService.transferFromToCardUser(3L, request))
+        assertThatThrownBy(() -> transferServiceImpl.transferFromToCardUser(3L, request))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test
     void transferFromToCardUser_TransferNotFound() {
         when(transferRepository.findById(5L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> transferService.getById(5L))
+        assertThatThrownBy(() -> transferServiceImpl.getById(5L))
                 .isInstanceOf(TransferNotFoundException.class);
     }
 
@@ -145,7 +147,7 @@ class TransferServiceTest {
         Page<Transfer> page = new PageImpl<>(List.of(transfer));
         when(transferRepository.findAll(PageRequest.of(0, 5))).thenReturn(page);
         when(transferMapper.toDto(transfer)).thenReturn(dto);
-        Page<TransferUserDto> result = transferService.getAll(0, 5);
+        Page<TransferUserDto> result = transferServiceImpl.getAll(0, 5);
         assertThat(result.getContent()).containsExactly(dto);
     }
 
@@ -153,7 +155,7 @@ class TransferServiceTest {
     void getById_Success() {
         when(transferRepository.findById(4L)).thenReturn(Optional.of(transfer));
         when(transferMapper.toDto(transfer)).thenReturn(dto);
-        TransferUserDto result = transferService.getById(4L);
+        TransferUserDto result = transferServiceImpl.getById(4L);
         assertThat(result).isEqualTo(dto);
     }
 
@@ -162,7 +164,7 @@ class TransferServiceTest {
         Page<Transfer> page = new PageImpl<>(List.of(transfer));
         when(transferRepository.findAllByInitiatorId(3L, PageRequest.of(0, 5))).thenReturn(page);
         when(transferMapper.toDto(transfer)).thenReturn(dto);
-        Page<TransferUserDto> result = transferService.getAllByUser(0, 5, 3L);
+        Page<TransferUserDto> result = transferServiceImpl.getAllByUser(0, 5, 3L);
         assertThat(result.getContent()).containsExactly(dto);
     }
 }

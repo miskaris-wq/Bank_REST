@@ -7,14 +7,14 @@ import com.example.bankcards.entity.bankcard.BankCard;
 import com.example.bankcards.entity.bankcard.Status;
 import com.example.bankcards.entity.block.CardRequestStatus;
 import com.example.bankcards.entity.user.User;
-import com.example.bankcards.exception.CardNotFoundException;
-import com.example.bankcards.exception.InactiveCardException;
-import com.example.bankcards.exception.InsufficientFundsException;
-import com.example.bankcards.exception.StatusAlreadySetException;
+import com.example.bankcards.exception.*;
 import com.example.bankcards.mappers.BankCardBalanceMapper;
 import com.example.bankcards.mappers.BankCardMapper;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
+import com.example.bankcards.service.impl.CardRequestServiceImpl;
+import com.example.bankcards.service.impl.CardServiceImpl;
+import com.example.bankcards.service.impl.UserServiceImpl;
 import com.example.bankcards.util.CardEncryptionUtil;
 import com.example.bankcards.util.CardNumberGenerator;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +40,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class CardServiceTest {
+class CardServiceImplTest {
 
     @Mock
     private CardRepository cardRepository;
@@ -58,14 +58,14 @@ class CardServiceTest {
     private CardEncryptionUtil cardEncryptionUtil;
 
     @Mock
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @Mock
-    private CardRequestService cardRequestService;
+    private CardRequestServiceImpl cardRequestServiceImpl;
 
     @Spy
     @InjectMocks
-    private CardService cardService;
+    private CardServiceImpl cardServiceImpl;
 
     private User user;
     private BankCard card;
@@ -93,7 +93,7 @@ class CardServiceTest {
             when(userRepository.findById(1L)).thenReturn(Optional.of(user));
             when(bankCardMapper.toDto(any())).thenReturn(cardDto);
 
-            BankCardDTO result = cardService.create(request);
+            BankCardDTO result = cardServiceImpl.create(request);
 
             verify(cardRepository).save(any(BankCard.class));
             assertThat(result).isEqualTo(cardDto);
@@ -105,36 +105,36 @@ class CardServiceTest {
         CreateCardRequest request = new CreateCardRequest();
         request.setOwnerId(1L);
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> cardService.create(request))
-                .isInstanceOf(CardNotFoundException.class);
+        assertThatThrownBy(() -> cardServiceImpl.create(request))
+                .isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test
     void activate_Success() {
-        doReturn(cardDto).when(cardService).changeStatusCard(Status.ACTIVE, 2L);
-        BankCardDTO result = cardService.activate(2L);
+        doReturn(cardDto).when(cardServiceImpl).changeStatusCard(Status.ACTIVE, 2L);
+        BankCardDTO result = cardServiceImpl.activate(2L);
         assertThat(result).isEqualTo(cardDto);
     }
 
     @Test
     void blocked_Success() {
-        doReturn(cardDto).when(cardService).changeStatusCard(Status.BLOCKED, 2L);
-        when(cardRequestService.changeStatus(2L, CardRequestStatus.APPROVED)).thenReturn(null);
-        BankCardDTO result = cardService.blocked(2L);
+        doReturn(cardDto).when(cardServiceImpl).changeStatusCard(Status.BLOCKED, 2L);
+        when(cardRequestServiceImpl.changeStatus(2L, CardRequestStatus.APPROVED)).thenReturn(null);
+        BankCardDTO result = cardServiceImpl.blocked(2L);
         assertThat(result).isEqualTo(cardDto);
     }
 
     @Test
     void delete_Success() {
         when(cardRepository.existsById(2L)).thenReturn(true);
-        cardService.delete(2L);
+        cardServiceImpl.delete(2L);
         verify(cardRepository).deleteById(2L);
     }
 
     @Test
     void delete_NotFound() {
         when(cardRepository.existsById(2L)).thenReturn(false);
-        assertThatThrownBy(() -> cardService.delete(2L))
+        assertThatThrownBy(() -> cardServiceImpl.delete(2L))
                 .isInstanceOf(CardNotFoundException.class);
     }
 
@@ -144,7 +144,7 @@ class CardServiceTest {
         when(cardRepository.findById(2L)).thenReturn(Optional.of(card));
         when(cardRepository.save(card)).thenReturn(card);
         when(bankCardMapper.toDto(card)).thenReturn(cardDto);
-        BankCardDTO result = cardService.changeStatusCard(Status.ACTIVE, 2L);
+        BankCardDTO result = cardServiceImpl.changeStatusCard(Status.ACTIVE, 2L);
         assertThat(result).isEqualTo(cardDto);
     }
 
@@ -152,7 +152,7 @@ class CardServiceTest {
     void changeStatusCard_AlreadySet() {
         card.setStatus(Status.ACTIVE);
         when(cardRepository.findById(2L)).thenReturn(Optional.of(card));
-        assertThatThrownBy(() -> cardService.changeStatusCard(Status.ACTIVE, 2L))
+        assertThatThrownBy(() -> cardServiceImpl.changeStatusCard(Status.ACTIVE, 2L))
                 .isInstanceOf(StatusAlreadySetException.class);
     }
 
@@ -161,31 +161,31 @@ class CardServiceTest {
         Page<BankCard> page = new PageImpl<>(List.of(card));
         when(cardRepository.findAllByOwnerId(PageRequest.of(0, 5), 1L)).thenReturn(page);
         when(bankCardMapper.toDto(card)).thenReturn(cardDto);
-        Page<BankCardDTO> result = cardService.getAllCurrentUser(0,5,1L);
+        Page<BankCardDTO> result = cardServiceImpl.getAllCurrentUser(0,5,1L);
         assertThat(result.getContent()).containsExactly(cardDto);
     }
 
     @Test
     void getAllCurrentUser_Page_Empty() {
         when(cardRepository.findAllByOwnerId(PageRequest.of(0, 5), 1L)).thenReturn(Page.empty());
-        assertThatThrownBy(() -> cardService.getAllCurrentUser(0,5,1L))
+        assertThatThrownBy(() -> cardServiceImpl.getAllCurrentUser(0,5,1L))
                 .isInstanceOf(CardNotFoundException.class);
     }
 
     @Test
     void getAllCurrentUser_List_Success() {
-        when(userService.getCurrentUser()).thenReturn(user);
+        when(userServiceImpl.getCurrentUser()).thenReturn(user);
         when(cardRepository.findAllByOwnerId(1L)).thenReturn(List.of(card));
         when(bankCardMapper.toDto(card)).thenReturn(cardDto);
-        List<BankCardDTO> result = cardService.getAllCurrentUser();
+        List<BankCardDTO> result = cardServiceImpl.getAllCurrentUser();
         assertThat(result).containsExactly(cardDto);
     }
 
     @Test
     void getAllCurrentUser_List_Empty() {
-        when(userService.getCurrentUser()).thenReturn(user);
+        when(userServiceImpl.getCurrentUser()).thenReturn(user);
         when(cardRepository.findAllByOwnerId(1L)).thenReturn(Collections.emptyList());
-        assertThatThrownBy(() -> cardService.getAllCurrentUser())
+        assertThatThrownBy(() -> cardServiceImpl.getAllCurrentUser())
                 .isInstanceOf(CardNotFoundException.class);
     }
 
@@ -194,14 +194,14 @@ class CardServiceTest {
         Page<BankCard> page = new PageImpl<>(List.of(card));
         when(cardRepository.findAll(PageRequest.of(0,5))).thenReturn(page);
         when(bankCardMapper.toDto(card)).thenReturn(cardDto);
-        Page<BankCardDTO> result = cardService.getAll(0,5);
+        Page<BankCardDTO> result = cardServiceImpl.getAll(0,5);
         assertThat(result.getContent()).containsExactly(cardDto);
     }
 
     @Test
     void getAll_Empty() {
         when(cardRepository.findAll(PageRequest.of(0,5))).thenReturn(Page.empty());
-        assertThatThrownBy(() -> cardService.getAll(0,5))
+        assertThatThrownBy(() -> cardServiceImpl.getAll(0,5))
                 .isInstanceOf(CardNotFoundException.class);
     }
 
@@ -209,21 +209,21 @@ class CardServiceTest {
     void getById_Success() {
         when(cardRepository.findById(2L)).thenReturn(Optional.of(card));
         when(bankCardMapper.toDto(card)).thenReturn(cardDto);
-        BankCardDTO result = cardService.getById(2L);
+        BankCardDTO result = cardServiceImpl.getById(2L);
         assertThat(result).isEqualTo(cardDto);
     }
 
     @Test
     void getById_NotFound() {
         when(cardRepository.findById(2L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> cardService.getById(2L))
+        assertThatThrownBy(() -> cardServiceImpl.getById(2L))
                 .isInstanceOf(CardNotFoundException.class);
     }
 
     @Test
     void isOwnerCard() {
         when(cardRepository.existsByIdAndOwnerId(2L,1L)).thenReturn(true);
-        assertThat(cardService.isOwnerCard(1L,2L)).isTrue();
+        assertThat(cardServiceImpl.isOwnerCard(1L,2L)).isTrue();
     }
 
     @Test
@@ -233,14 +233,14 @@ class CardServiceTest {
         when(cardRepository.findById(2L)).thenReturn(Optional.of(card));
         when(cardRepository.save(card)).thenReturn(card);
         when(bankCardBalanceMapper.toDto(card)).thenReturn(balanceDto);
-        CardBalanceDto result = cardService.withdraw(2L, BigDecimal.valueOf(50));
+        CardBalanceDto result = cardServiceImpl.withdraw(2L, BigDecimal.valueOf(50));
         assertThat(result).isEqualTo(balanceDto);
     }
 
     @Test
     void withdraw_NotFound() {
         when(cardRepository.findById(2L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> cardService.withdraw(2L, BigDecimal.ONE))
+        assertThatThrownBy(() -> cardServiceImpl.withdraw(2L, BigDecimal.ONE))
                 .isInstanceOf(CardNotFoundException.class);
     }
 
@@ -248,7 +248,7 @@ class CardServiceTest {
     void withdraw_NotActive() {
         card.setStatus(Status.BLOCKED);
         when(cardRepository.findById(2L)).thenReturn(Optional.of(card));
-        assertThatThrownBy(() -> cardService.withdraw(2L, BigDecimal.ONE))
+        assertThatThrownBy(() -> cardServiceImpl.withdraw(2L, BigDecimal.ONE))
                 .isInstanceOf(InactiveCardException.class);
     }
 
@@ -257,7 +257,7 @@ class CardServiceTest {
         card.setStatus(Status.ACTIVE);
         card.setBalance(BigDecimal.valueOf(10));
         when(cardRepository.findById(2L)).thenReturn(Optional.of(card));
-        assertThatThrownBy(() -> cardService.withdraw(2L, BigDecimal.valueOf(20)))
+        assertThatThrownBy(() -> cardServiceImpl.withdraw(2L, BigDecimal.valueOf(20)))
                 .isInstanceOf(InsufficientFundsException.class);
     }
 
@@ -268,7 +268,7 @@ class CardServiceTest {
         when(cardRepository.findById(2L)).thenReturn(Optional.of(card));
         when(cardRepository.save(card)).thenReturn(card);
         when(bankCardBalanceMapper.toDto(card)).thenReturn(balanceDto);
-        CardBalanceDto result = cardService.deposit(2L, BigDecimal.valueOf(50));
+        CardBalanceDto result = cardServiceImpl.deposit(2L, BigDecimal.valueOf(50));
         assertThat(result).isEqualTo(balanceDto);
     }
 
@@ -276,7 +276,7 @@ class CardServiceTest {
     void deposit_NotActive() {
         card.setStatus(Status.BLOCKED);
         when(cardRepository.findById(2L)).thenReturn(Optional.of(card));
-        assertThatThrownBy(() -> cardService.deposit(2L, BigDecimal.valueOf(50)))
+        assertThatThrownBy(() -> cardServiceImpl.deposit(2L, BigDecimal.valueOf(50)))
                 .isInstanceOf(InactiveCardException.class);
     }
 
@@ -285,7 +285,7 @@ class CardServiceTest {
         when(cardRepository.findAllByOwnerIdAndId(1L,2L))
                 .thenReturn(Optional.of(card));
         when(bankCardBalanceMapper.toDto(card)).thenReturn(balanceDto);
-        CardBalanceDto result = cardService.getBalance(1L,2L);
+        CardBalanceDto result = cardServiceImpl.getBalance(1L,2L);
         assertThat(result).isEqualTo(balanceDto);
     }
 
@@ -293,13 +293,13 @@ class CardServiceTest {
     void getBalance_NotFound() {
         when(cardRepository.findAllByOwnerIdAndId(1L,2L))
                 .thenReturn(Optional.empty());
-        assertThatThrownBy(() -> cardService.getBalance(1L,2L))
+        assertThatThrownBy(() -> cardServiceImpl.getBalance(1L,2L))
                 .isInstanceOf(CardNotFoundException.class);
     }
 
     @Test
     void isActivated() {
         card.setStatus(Status.ACTIVE);
-        assertThat(cardService.isActivated(card)).isTrue();
+        assertThat(cardServiceImpl.isActivated(card)).isTrue();
     }
 }

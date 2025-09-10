@@ -1,10 +1,11 @@
 package com.example.bankcards.controller;
 
+import com.example.bankcards.controller.impl.UserControllerImpl;
 import com.example.bankcards.dto.CardBalanceDto;
 import com.example.bankcards.dto.TotalCardBalanceDTO;
 import com.example.bankcards.dto.UserDTO;
 import com.example.bankcards.entity.user.Role;
-import com.example.bankcards.service.UserService;
+import com.example.bankcards.service.impl.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,7 +36,7 @@ class UserControllerImplTest {
     private MockMvc mvc;
 
     @Mock
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @InjectMocks
     private UserControllerImpl userController;
@@ -57,7 +58,7 @@ class UserControllerImplTest {
         u.setPassword("pass1");
         u.setRoles(Set.of(Role.USER));
         Page<UserDTO> page = new PageImpl<>(List.of(u), PageRequest.of(1, 2), 1);
-        given(userService.getUserByUsername(1, 2)).willReturn(page);
+        given(userServiceImpl.getUserByUsername(1, 2)).willReturn(page);
 
         mvc.perform(get("/api/v1/user/all").param("page", "1").param("size", "2"))
                 .andExpect(status().isOk())
@@ -74,7 +75,7 @@ class UserControllerImplTest {
         u.setUsername("user2");
         u.setPassword("pass2");
         u.setRoles(Set.of(Role.ADMIN));
-        given(userService.getUserById(5L)).willReturn(u);
+        given(userServiceImpl.getUserById(5L)).willReturn(u);
 
         mvc.perform(get("/api/v1/user/5"))
                 .andExpect(status().isOk())
@@ -91,7 +92,7 @@ class UserControllerImplTest {
         u.setUsername("updatedUser");
         u.setPassword("newPass");
         u.setRoles(Set.of(Role.USER));
-        given(userService.update(5L, u)).willReturn(u);
+        given(userServiceImpl.update(5L, u)).willReturn(u);
 
         mvc.perform(patch("/api/v1/user/5")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -120,7 +121,7 @@ class UserControllerImplTest {
                 .cardBalances(List.of(cbd))
                 .totalBalance(BigDecimal.valueOf(100))
                 .build();
-        given(userService.getTotalBalance(5L)).willReturn(total);
+        given(userServiceImpl.getTotalBalance(5L)).willReturn(total);
 
         mvc.perform(get("/api/v1/user/5/total-balance"))
                 .andExpect(status().isOk())

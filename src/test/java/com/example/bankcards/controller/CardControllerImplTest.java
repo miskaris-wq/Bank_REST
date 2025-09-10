@@ -1,11 +1,12 @@
 package com.example.bankcards.controller;
 
+import com.example.bankcards.controller.impl.CardControllerImpl;
 import com.example.bankcards.dto.BankCardDTO;
 import com.example.bankcards.dto.CardBalanceDto;
 import com.example.bankcards.dto.Requests.CreateCardRequest;
 import com.example.bankcards.dto.Requests.ReplenishRequest;
 import com.example.bankcards.security.JwtComponent;
-import com.example.bankcards.service.CardService;
+import com.example.bankcards.service.impl.CardServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ class CardControllerImplTest {
     private MockMvc mvc;
 
     @Mock
-    private CardService cardService;
+    private CardServiceImpl cardServiceImpl;
 
     @InjectMocks
     private CardControllerImpl cardControllerImpl;
@@ -59,7 +60,7 @@ class CardControllerImplTest {
     void getAll_Success() throws Exception {
         BankCardDTO dto = BankCardDTO.builder().cardNumber("5555-6666-7777-8888").build();
         Page<BankCardDTO> page = new PageImpl<>(List.of(dto), PageRequest.of(0,5), 1);
-        given(cardService.getAll(0,5)).willReturn(page);
+        given(cardServiceImpl.getAll(0,5)).willReturn(page);
 
         mvc.perform(get("/api/v1/cards/all"))
                 .andExpect(status().isOk())
@@ -74,7 +75,7 @@ class CardControllerImplTest {
         BankCardDTO dto = BankCardDTO.builder().cardNumber("1234-1234-1234-1234").build();
         Pageable pg = PageRequest.of(1,2);
         Page<BankCardDTO> page = new PageImpl<>(List.of(dto), pg, 1);
-        given(cardService.getAllCurrentUser(1,2, 99L)).willReturn(page);
+        given(cardServiceImpl.getAllCurrentUser(1,2, 99L)).willReturn(page);
 
         mvc.perform(get("/api/v1/cards/all/by-user/99")
                         .param("page","1").param("size","2"))
@@ -86,7 +87,7 @@ class CardControllerImplTest {
     @DisplayName("GET /api/v1/cards/{id} → 200 + одна карта")
     void getById_Success() throws Exception {
         BankCardDTO dto = BankCardDTO.builder().cardNumber("0000-0000-0000-0005").build();
-        given(cardService.getById(5L)).willReturn(dto);
+        given(cardServiceImpl.getById(5L)).willReturn(dto);
 
         mvc.perform(get("/api/v1/cards/5"))
                 .andExpect(status().isOk())
@@ -98,7 +99,7 @@ class CardControllerImplTest {
     void create_Success() throws Exception {
         CreateCardRequest req = CreateCardRequest.builder().ownerId(10L).build();
         BankCardDTO dto = BankCardDTO.builder().cardNumber("9999 8888 7777 6666").build();
-        given(cardService.create(any(CreateCardRequest.class))).willReturn(dto);
+        given(cardServiceImpl.create(any(CreateCardRequest.class))).willReturn(dto);
 
         mvc.perform(post("/api/v1/cards/create")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -111,7 +112,7 @@ class CardControllerImplTest {
     @DisplayName("PATCH /api/v1/cards/blocked/{id} → 200 + заблокированная карта")
     void blocked_Success() throws Exception {
         BankCardDTO dto = BankCardDTO.builder().cardNumber("3333").build();
-        given(cardService.blocked(3L)).willReturn(dto);
+        given(cardServiceImpl.blocked(3L)).willReturn(dto);
 
         mvc.perform(patch("/api/v1/cards/blocked/3"))
                 .andExpect(status().isOk())
@@ -122,7 +123,7 @@ class CardControllerImplTest {
     @DisplayName("PATCH /api/v1/cards/activate/{id} → 200 + активированная карта")
     void activate_Success() throws Exception {
         BankCardDTO dto = BankCardDTO.builder().cardNumber("4444").build();
-        given(cardService.activate(4L)).willReturn(dto);
+        given(cardServiceImpl.activate(4L)).willReturn(dto);
 
         mvc.perform(patch("/api/v1/cards/activate/4"))
                 .andExpect(status().isOk())
@@ -142,7 +143,7 @@ class CardControllerImplTest {
     @DisplayName("GET /api/v1/cards/balance/{cardId}/user/{userId} → 200 + баланс")
     void getBalance_Success() throws Exception {
         CardBalanceDto bal = CardBalanceDto.builder().balance(BigDecimal.valueOf(123.45)).build();
-        given(cardService.getBalance(77L, 88L)).willReturn(bal);
+        given(cardServiceImpl.getBalance(77L, 88L)).willReturn(bal);
 
         mvc.perform(get("/api/v1/cards/balance/88/user/77"))
                 .andExpect(status().isOk())
@@ -154,7 +155,7 @@ class CardControllerImplTest {
     void replenish_Success() throws Exception {
         ReplenishRequest req = ReplenishRequest.builder().amount(BigDecimal.TEN).build();
         CardBalanceDto bal = CardBalanceDto.builder().balance(BigDecimal.valueOf(10)).build();
-        given(cardService.deposit(90L, BigDecimal.TEN)).willReturn(bal);
+        given(cardServiceImpl.deposit(90L, BigDecimal.TEN)).willReturn(bal);
 
         mvc.perform(post("/api/v1/cards/replenish/90")
                         .contentType(MediaType.APPLICATION_JSON)

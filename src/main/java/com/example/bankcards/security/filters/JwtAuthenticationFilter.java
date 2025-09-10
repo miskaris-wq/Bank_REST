@@ -5,7 +5,7 @@ import com.example.bankcards.exception.InvalidTokenException;
 import com.example.bankcards.exception.JwtAuthenticationException;
 import com.example.bankcards.exception.TokenExpiredException;
 import com.example.bankcards.security.JwtComponent;
-import com.example.bankcards.service.UserDetailService;
+import com.example.bankcards.service.impl.UserDetailService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

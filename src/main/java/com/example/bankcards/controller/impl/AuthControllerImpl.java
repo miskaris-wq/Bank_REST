@@ -1,4 +1,4 @@
-package com.example.bankcards.controller;
+package com.example.bankcards.controller.impl;
 
 import com.example.bankcards.controller.interfaces.AuthController;
 import com.example.bankcards.dto.JwtDTO;
@@ -7,7 +7,7 @@ import com.example.bankcards.dto.Requests.LogoutRequest;
 import com.example.bankcards.dto.Requests.RegisterRequest;
 import com.example.bankcards.dto.Responses.JwtResponse;
 import com.example.bankcards.dto.Responses.Response;
-import com.example.bankcards.service.AuthService;
+import com.example.bankcards.service.impl.AuthServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,29 +15,29 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AuthControllerImpl implements AuthController {
 
-    private final AuthService authService;
+    private final AuthServiceImpl authServiceImpl;
 
-    public AuthControllerImpl(AuthService authService) {
-        this.authService = authService;
+    public AuthControllerImpl(AuthServiceImpl authServiceImpl) {
+        this.authServiceImpl = authServiceImpl;
     }
 
     @Override
     public ResponseEntity<JwtResponse> login(LoginRequest loginRequest) {
-        JwtDTO tokenInfo = authService.login(loginRequest);
+        JwtDTO tokenInfo = authServiceImpl.login(loginRequest);
         JwtResponse response = new JwtResponse(tokenInfo, "Вход выполнен успешно", HttpStatus.OK);
         return ResponseEntity.ok(response);
     }
 
     @Override
     public ResponseEntity<JwtResponse> register(RegisterRequest registerRequest) {
-        JwtDTO tokenInfo = authService.register(registerRequest);
+        JwtDTO tokenInfo = authServiceImpl.register(registerRequest);
         JwtResponse response = new JwtResponse(tokenInfo, "Регистрация прошла успешно", HttpStatus.OK);
         return ResponseEntity.ok(response);
     }
 
     @Override
     public ResponseEntity<Response<Void>> logout(LogoutRequest logoutRequest) {
-        authService.logout(logoutRequest.getUsername());
+        authServiceImpl.logout(logoutRequest.getUsername());
         Response<Void> response = Response.of("Выход из системы выполнен", HttpStatus.OK);
         return ResponseEntity.ok(response);
     }

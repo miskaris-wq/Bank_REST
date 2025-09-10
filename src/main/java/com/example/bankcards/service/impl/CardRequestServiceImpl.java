@@ -1,4 +1,4 @@
-package com.example.bankcards.service;
+package com.example.bankcards.service.impl;
 
 import com.example.bankcards.dto.CardRequestDTO;
 import com.example.bankcards.entity.bankcard.BankCard;
@@ -9,7 +9,8 @@ import com.example.bankcards.exception.ResourceNotFoundException;
 import com.example.bankcards.mappers.CardRequestMapper;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.CardRequestRepository;
-import lombok.AllArgsConstructor;
+import com.example.bankcards.service.interfaces.CardRequestService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -20,115 +21,111 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 @Service
-@AllArgsConstructor
-public class CardRequestService {
+@RequiredArgsConstructor
+public class CardRequestServiceImpl implements CardRequestService {
 
     private final CardRepository cardRepository;
     private final CardRequestRepository cardRequestRepository;
     private final CardRequestMapper cardRequestMapper;
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
 
+    @Override
     @Transactional
-    @CacheEvict(value = {
-            "cardRequestByUser",
-            "cardRequests",
-            "cardRequestsByUser"
-    }, allEntries = true)
-    public CardRequestDTO requestBlock(Long id) {
-        BankCard card = cardRepository.findById(id)
+    @CacheEvict(value = {"cardRequestByUser", "cardRequests", "cardRequestsByUser"}, allEntries = true)
+    public CardRequestDTO requestBlock(Long cardId) {
+        BankCard card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("Карта с id=%d не найдена", id))
-                );
+                        "Не удалось найти карту с ID = " + cardId
+                ));
 
-        User user = userService.getCurrentUser();
+        User user = userServiceImpl.getCurrentUser();
 
         CardRequest blockRequest = CardRequest.builder()
                 .card(card)
                 .status(CardRequestStatus.PENDING)
                 .initiator(user)
                 .requestedAt(LocalDateTime.now())
-                .message("Запрос на блокировку создан пользователем")
+                .message("Пользователь создал заявку на блокировку карты")
                 .build();
 
         CardRequest saved = cardRequestRepository.save(blockRequest);
 
-        return CardRequestDTO.builder()
-                .requestId(saved.getId())
-                .cardId(card.getId())
-                .status(saved.getStatus().name())
-                .requestedAt(saved.getRequestedAt())
-                .message(saved.getMessage())
-                .build();
+        return cardRequestMapper.toDto(saved);
     }
 
-    @CacheEvict(value = {
-            "cardRequestByUser",
-            "cardRequests",
-            "cardRequestsByUser"
-    }, allEntries = true)
-    public CardRequestDTO changeStatus(Long cardId, CardRequestStatus status){
+    @Override
+    @CacheEvict(value = {"cardRequestByUser", "cardRequests", "cardRequestsByUser"}, allEntries = true)
+    public CardRequestDTO changeStatus(Long cardId, CardRequestStatus status) {
         CardRequest cardRequest = cardRequestRepository.findByCard_Id(cardId)
-                .orElseThrow(() -> new ResourceNotFoundException("Запроса с такой карточкой не существует"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Запрос для карты с ID " + cardId + " не найден"
+                ));
 
         cardRequest.setStatus(status);
+        CardRequest updated = cardRequestRepository.save(cardRequest);
 
-        cardRequest = cardRequestRepository.save(cardRequest);
-
-        return cardRequestMapper.toDto(cardRequest);
+        return cardRequestMapper.toDto(updated);
     }
 
+    @Override
     @Cacheable(value = "cardRequest", key = "#id")
     public CardRequestDTO getId(Long id) {
-
-        CardRequest cardRequest = cardRequestRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Запроса по данному ID не найдено"));
-
+        CardRequest cardRequest = cardRequestRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Не найдено запроса по ID " + id
+                ));
         return cardRequestMapper.toDto(cardRequest);
     }
 
+    @Override
     @Cacheable(value = "cardRequestsByUser", key = "#pageNumber + '-' + #pageSize + '-' + #userId")
     public Page<CardRequestDTO> getAllByUser(Long userId, int pageNumber, int pageSize) {
+        Page<CardRequest> requests = cardRequestRepository.findAllByInitiatorId(userId, PageRequest.of(pageNumber, pageSize));
 
-        Page<CardRequest>cardRequests = cardRequestRepository.findAllByInitiatorId(userId, PageRequest.of(pageNumber, pageSize));
-
-        if(cardRequests.isEmpty()){
-            throw new ResourceNotFoundException("Пользователь пока не отправлял запросов");
+        if (requests.isEmpty()) {
+            throw new ResourceNotFoundException("У пользователя с ID " + userId + " пока нет заявок");
         }
 
-        return cardRequests.map(cardRequestMapper::toDto);
+        return requests.map(cardRequestMapper::toDto);
     }
 
+    @Override
     @Cacheable(value = "cardRequests", key = "#pageNumber + '-' + #pageSize")
     public Page<CardRequestDTO> getAll(int pageNumber, int pageSize) {
+        Page<CardRequest> requests = cardRequestRepository.findAll(PageRequest.of(pageNumber, pageSize));
 
-        Page<CardRequest> cardRequests = cardRequestRepository.findAll(PageRequest.of(pageNumber, pageSize));
-
-        if(cardRequests.isEmpty()){
-            throw new ResourceNotFoundException("Пока запросов нет");
+        if (requests.isEmpty()) {
+            throw new ResourceNotFoundException("Заявки на блокировку отсутствуют");
         }
 
-        return cardRequests.map(cardRequestMapper::toDto);
+        return requests.map(cardRequestMapper::toDto);
     }
 
+    @Override
     public CardRequestDTO requestRejected(Long id) {
-
         cardRequestRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Запроса с таким ID не существует"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Не найден запрос с ID " + id
+                ));
 
         return changeStatus(id, CardRequestStatus.REJECTED);
     }
 
+    @Override
     public boolean getIsOwnerCardRequest(Long cardRequestId, Long userId) {
-        if(cardRequestId == null || userId == null) {
+        if (cardRequestId == null || userId == null) {
             return false;
         }
-
         return cardRequestRepository.existsCardRequestByIdAndInitiator_Id(cardRequestId, userId);
     }
 
+    @Override
     @Cacheable(value = "cardRequestByUser", key = "#id + '-' + #userId")
     public CardRequestDTO getIdByUser(Long id, Long userId) {
         CardRequest cardRequest = cardRequestRepository.findByIdAndInitiator_Id(id, userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Запроса по данному ID не найдено"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Заявка с ID " + id + " у пользователя " + userId + " не найдена"
+                ));
 
         return cardRequestMapper.toDto(cardRequest);
     }

@@ -7,6 +7,8 @@ import com.example.bankcards.entity.user.User;
 import com.example.bankcards.exception.CustomUserNotFoundException;
 import com.example.bankcards.mappers.UserMapper;
 import com.example.bankcards.repository.UserRepository;
+import com.example.bankcards.service.impl.CardServiceImpl;
+import com.example.bankcards.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +32,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest {
+class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
@@ -39,10 +41,10 @@ class UserServiceTest {
     private UserMapper userMapper;
 
     @Mock
-    private CardService cardService;
+    private CardServiceImpl cardServiceImpl;
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     private User user;
     private UserDTO userDto;
@@ -68,14 +70,14 @@ class UserServiceTest {
     @Test
     void getUserByUsername_Success() {
         when(userRepository.findByUsername("u")).thenReturn(Optional.of(user));
-        User result = userService.getUserByUsername("u");
+        User result = userServiceImpl.getUserByUsername("u");
         assertThat(result).isEqualTo(user);
     }
 
     @Test
     void getUserByUsername_NotFound() {
         when(userRepository.findByUsername("u")).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> userService.getUserByUsername("u"))
+        assertThatThrownBy(() -> userServiceImpl.getUserByUsername("u"))
                 .isInstanceOf(Exception.class);
     }
 
@@ -87,7 +89,7 @@ class UserServiceTest {
         when(context.getAuthentication()).thenReturn(auth);
         SecurityContextHolder.setContext(context);
         when(userRepository.findByUsername("u")).thenReturn(Optional.of(user));
-        User result = userService.getCurrentUser();
+        User result = userServiceImpl.getCurrentUser();
         assertThat(result).isEqualTo(user);
     }
 
@@ -96,20 +98,20 @@ class UserServiceTest {
         Page<User> page = new PageImpl<>(List.of(user));
         when(userRepository.findAll(PageRequest.of(0,5))).thenReturn(page);
         when(userMapper.toDto(user)).thenReturn(userDto);
-        Page<UserDTO> result = userService.getUserByUsername(0,5);
+        Page<UserDTO> result = userServiceImpl.getUserByUsername(0,5);
         assertThat(result.getContent()).containsExactly(userDto);
     }
 
     @Test
     void getUserByUsername_Page_Empty() {
         when(userRepository.findAll(PageRequest.of(0,5))).thenReturn(Page.empty());
-        assertThatThrownBy(() -> userService.getUserByUsername(0,5))
+        assertThatThrownBy(() -> userServiceImpl.getUserByUsername(0,5))
                 .isInstanceOf(CustomUserNotFoundException.class);
     }
 
     @Test
     void delete_Success() {
-        userService.delete(1L);
+        userServiceImpl.delete(1L);
         verify(userRepository).deleteById(1L);
     }
 
@@ -117,21 +119,21 @@ class UserServiceTest {
     void getUserById_Success() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userMapper.toDto(user)).thenReturn(userDto);
-        UserDTO result = userService.getUserById(1L);
+        UserDTO result = userServiceImpl.getUserById(1L);
         assertThat(result).isEqualTo(userDto);
     }
 
     @Test
     void getUserById_NotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> userService.getUserById(1L))
+        assertThatThrownBy(() -> userServiceImpl.getUserById(1L))
                 .isInstanceOf(CustomUserNotFoundException.class);
     }
 
     @Test
     void update_NotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> userService.update(1L, new UserDTO()))
+        assertThatThrownBy(() -> userServiceImpl.update(1L, new UserDTO()))
                 .isInstanceOf(CustomUserNotFoundException.class);
     }
 }

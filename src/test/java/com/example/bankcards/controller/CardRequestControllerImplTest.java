@@ -1,7 +1,8 @@
 package com.example.bankcards.controller;
 
+import com.example.bankcards.controller.impl.CardRequestControllerImpl;
 import com.example.bankcards.dto.CardRequestDTO;
-import com.example.bankcards.service.CardRequestService;
+import com.example.bankcards.service.impl.CardRequestServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ class CardRequestControllerImplTest {
     private MockMvc mvc;
 
     @Mock
-    private CardRequestService cardRequestService;
+    private CardRequestServiceImpl cardRequestServiceImpl;
 
     @InjectMocks
     private CardRequestControllerImpl cardRequestController;
@@ -48,7 +49,7 @@ class CardRequestControllerImplTest {
                 .cardId(10L)
                 .status("PENDING")
                 .build();
-        given(cardRequestService.requestBlock(10L)).willReturn(dto);
+        given(cardRequestServiceImpl.requestBlock(10L)).willReturn(dto);
 
         mvc.perform(post("/api/v1/card-request/block/10"))
                 .andExpect(status().isAccepted())
@@ -67,7 +68,7 @@ class CardRequestControllerImplTest {
                 .cardId(11L)
                 .status("REJECTED")
                 .build();
-        given(cardRequestService.requestRejected(66L)).willReturn(dto);
+        given(cardRequestServiceImpl.requestRejected(66L)).willReturn(dto);
 
         mvc.perform(post("/api/v1/card-request/rejected/66"))
                 .andExpect(status().isOk())
@@ -85,7 +86,7 @@ class CardRequestControllerImplTest {
                 .cardId(20L)
                 .status("PENDING")
                 .build();
-        given(cardRequestService.getIdByUser(77L, 99L)).willReturn(dto);
+        given(cardRequestServiceImpl.getIdByUser(77L, 99L)).willReturn(dto);
 
         mvc.perform(get("/api/v1/card-request/77/by-user").param("userId", "99"))
                 .andExpect(status().isOk())
@@ -103,7 +104,7 @@ class CardRequestControllerImplTest {
                 .cardId(5L)
                 .status("PENDING")
                 .build();
-        given(cardRequestService.getId(33L)).willReturn(dto);
+        given(cardRequestServiceImpl.getId(33L)).willReturn(dto);
 
         mvc.perform(get("/api/v1/card-request/33"))
                 .andExpect(status().isOk())
@@ -122,7 +123,7 @@ class CardRequestControllerImplTest {
                 .status("PENDING")
                 .build();
         Page<CardRequestDTO> page = new PageImpl<>(List.of(dto), PageRequest.of(1, 3), 1);
-        given(cardRequestService.getAllByUser(eq(88L), eq(1), eq(3))).willReturn(page);
+        given(cardRequestServiceImpl.getAllByUser(eq(88L), eq(1), eq(3))).willReturn(page);
 
         mvc.perform(get("/api/v1/card-request/all/by-user/88").param("page", "1").param("size", "3"))
                 .andExpect(status().isOk())
@@ -141,7 +142,7 @@ class CardRequestControllerImplTest {
                 .status("REJECTED")
                 .build();
         Page<CardRequestDTO> page = new PageImpl<>(List.of(dto), PageRequest.of(0, 5), 1);
-        given(cardRequestService.getAll(0, 5)).willReturn(page);
+        given(cardRequestServiceImpl.getAll(0, 5)).willReturn(page);
 
         mvc.perform(get("/api/v1/card-request/all"))
                 .andExpect(status().isOk())

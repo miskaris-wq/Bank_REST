@@ -1,8 +1,9 @@
 package com.example.bankcards.controller;
 
+import com.example.bankcards.controller.impl.TransferControllerImpl;
 import com.example.bankcards.dto.Requests.TransferUserRequest;
 import com.example.bankcards.dto.TransferUserDto;
-import com.example.bankcards.service.TransferService;
+import com.example.bankcards.service.impl.TransferServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,7 +37,7 @@ class TransferControllerImplTest {
     private MockMvc mvc;
 
     @Mock
-    private TransferService transferService;
+    private TransferServiceImpl transferServiceImpl;
 
     @InjectMocks
     private TransferControllerImpl transferController;
@@ -66,7 +67,7 @@ class TransferControllerImplTest {
                 .createdAt(Instant.now())
                 .build();
 
-        given(transferService.transferFromToCardUser(eq(7L), any(TransferUserRequest.class))).willReturn(dto);
+        given(transferServiceImpl.transferFromToCardUser(eq(7L), any(TransferUserRequest.class))).willReturn(dto);
 
         mvc.perform(post("/api/v1/transfer/user/7")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -89,7 +90,7 @@ class TransferControllerImplTest {
                 .build();
 
         Page<TransferUserDto> page = new PageImpl<>(List.of(dto), PageRequest.of(0, 5), 1);
-        given(transferService.getAll(0, 5)).willReturn(page);
+        given(transferServiceImpl.getAll(0, 5)).willReturn(page);
 
         mvc.perform(get("/api/v1/transfer/all"))
                 .andExpect(status().isOk())
@@ -109,7 +110,7 @@ class TransferControllerImplTest {
                 .build();
 
         Page<TransferUserDto> page = new PageImpl<>(List.of(dto), PageRequest.of(1, 3), 1);
-        given(transferService.getAllByUser(1, 3, 88L)).willReturn(page);
+        given(transferServiceImpl.getAllByUser(1, 3, 88L)).willReturn(page);
 
         mvc.perform(get("/api/v1/transfer/by-user/88")
                         .param("page", "1")
@@ -130,7 +131,7 @@ class TransferControllerImplTest {
                 .createdAt(Instant.now())
                 .build();
 
-        given(transferService.getById(401L)).willReturn(dto);
+        given(transferServiceImpl.getById(401L)).willReturn(dto);
 
         mvc.perform(get("/api/v1/transfer/401"))
                 .andExpect(status().isOk())

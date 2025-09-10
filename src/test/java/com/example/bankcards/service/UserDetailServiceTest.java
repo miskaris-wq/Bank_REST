@@ -3,6 +3,8 @@ package com.example.bankcards.service;
 import com.example.bankcards.entity.user.Role;
 import com.example.bankcards.entity.user.User;
 import com.example.bankcards.security.MyUserDetails;
+import com.example.bankcards.service.impl.UserDetailService;
+import com.example.bankcards.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +24,7 @@ import static org.mockito.Mockito.when;
 class UserDetailServiceTest {
 
     @Mock
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @InjectMocks
     private UserDetailService userDetailService;
@@ -39,7 +41,7 @@ class UserDetailServiceTest {
 
     @Test
     void loadUserByUsername_Success() {
-        when(userService.getUserByUsername("testuser")).thenReturn(user);
+        when(userServiceImpl.getUserByUsername("testuser")).thenReturn(user);
 
         UserDetails details = userDetailService.loadUserByUsername("testuser");
         assertThat(details).isInstanceOf(MyUserDetails.class);
@@ -50,7 +52,7 @@ class UserDetailServiceTest {
 
     @Test
     void loadUserByUsername_NotFound() {
-        when(userService.getUserByUsername("unknown")).thenThrow(new UsernameNotFoundException("not found"));
+        when(userServiceImpl.getUserByUsername("unknown")).thenThrow(new UsernameNotFoundException("not found"));
         assertThatThrownBy(() -> userDetailService.loadUserByUsername("unknown"))
                 .isInstanceOf(UsernameNotFoundException.class)
                 .hasMessage("not found");

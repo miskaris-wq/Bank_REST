@@ -9,6 +9,8 @@ import com.example.bankcards.exception.ResourceNotFoundException;
 import com.example.bankcards.mappers.CardRequestMapper;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.CardRequestRepository;
+import com.example.bankcards.service.impl.CardRequestServiceImpl;
+import com.example.bankcards.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +34,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class CardRequestServiceTest {
+class CardRequestServiceImplTest {
 
     @Mock
     private CardRepository cardRepository;
@@ -44,10 +46,10 @@ class CardRequestServiceTest {
     private CardRequestMapper cardRequestMapper;
 
     @Mock
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @InjectMocks
-    private CardRequestService cardRequestService;
+    private CardRequestServiceImpl cardRequestServiceImpl;
 
     @Captor
     private ArgumentCaptor<CardRequest> requestCaptor;
@@ -81,10 +83,21 @@ class CardRequestServiceTest {
     @Test
     void requestBlock_Success() {
         when(cardRepository.findById(1L)).thenReturn(Optional.of(card));
-        when(userService.getCurrentUser()).thenReturn(user);
+        when(userServiceImpl.getCurrentUser()).thenReturn(user);
         when(cardRequestRepository.save(any())).thenReturn(entity);
+        when(cardRequestMapper.toDto(any(CardRequest.class)))
+                .thenAnswer(invocation -> {
+                    CardRequest req = invocation.getArgument(0);
+                    return CardRequestDTO.builder()
+                            .requestId(req.getId() != null ? req.getId() : 3L)
+                            .cardId(req.getCard().getId())
+                            .status(req.getStatus().name())
+                            .requestedAt(req.getRequestedAt())
+                            .message(req.getMessage())
+                            .build();
+                });
 
-        CardRequestDTO result = cardRequestService.requestBlock(1L);
+        CardRequestDTO result = cardRequestServiceImpl.requestBlock(1L);
 
         verify(cardRequestRepository).save(requestCaptor.capture());
         CardRequest saved = requestCaptor.getValue();
@@ -97,7 +110,7 @@ class CardRequestServiceTest {
     @Test
     void requestBlock_NotFound() {
         when(cardRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> cardRequestService.requestBlock(1L))
+        assertThatThrownBy(() -> cardRequestServiceImpl.requestBlock(1L))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
@@ -107,7 +120,7 @@ class CardRequestServiceTest {
         when(cardRequestRepository.save(any())).thenReturn(entity);
         when(cardRequestMapper.toDto(any())).thenReturn(dto);
 
-        CardRequestDTO result = cardRequestService.changeStatus(1L, CardRequestStatus.APPROVED);
+        CardRequestDTO result = cardRequestServiceImpl.changeStatus(1L, CardRequestStatus.APPROVED);
 
         assertThat(result.getStatus()).isEqualTo("PENDING");
     }
@@ -115,7 +128,7 @@ class CardRequestServiceTest {
     @Test
     void changeStatus_NotFound() {
         when(cardRequestRepository.findByCard_Id(1L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> cardRequestService.changeStatus(1L, CardRequestStatus.APPROVED))
+        assertThatThrownBy(() -> cardRequestServiceImpl.changeStatus(1L, CardRequestStatus.APPROVED))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
@@ -124,7 +137,7 @@ class CardRequestServiceTest {
         when(cardRequestRepository.findById(3L)).thenReturn(Optional.of(entity));
         when(cardRequestMapper.toDto(entity)).thenReturn(dto);
 
-        CardRequestDTO result = cardRequestService.getId(3L);
+        CardRequestDTO result = cardRequestServiceImpl.getId(3L);
 
         assertThat(result).isEqualTo(dto);
     }
@@ -132,7 +145,7 @@ class CardRequestServiceTest {
     @Test
     void getId_NotFound() {
         when(cardRequestRepository.findById(3L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> cardRequestService.getId(3L))
+        assertThatThrownBy(() -> cardRequestServiceImpl.getId(3L))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
@@ -142,7 +155,7 @@ class CardRequestServiceTest {
         when(cardRequestRepository.findAllByInitiatorId(2L, PageRequest.of(0, 5))).thenReturn(page);
         when(cardRequestMapper.toDto(entity)).thenReturn(dto);
 
-        Page<CardRequestDTO> result = cardRequestService.getAllByUser(2L, 0, 5);
+        Page<CardRequestDTO> result = cardRequestServiceImpl.getAllByUser(2L, 0, 5);
 
         assertThat(result.getContent()).containsExactly(dto);
     }
@@ -151,7 +164,7 @@ class CardRequestServiceTest {
     void getAllByUser_Empty() {
         when(cardRequestRepository.findAllByInitiatorId(2L, PageRequest.of(0, 5)))
                 .thenReturn(Page.empty());
-        assertThatThrownBy(() -> cardRequestService.getAllByUser(2L, 0, 5))
+        assertThatThrownBy(() -> cardRequestServiceImpl.getAllByUser(2L, 0, 5))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
@@ -161,7 +174,7 @@ class CardRequestServiceTest {
         when(cardRequestRepository.findAll(PageRequest.of(0, 5))).thenReturn(page);
         when(cardRequestMapper.toDto(entity)).thenReturn(dto);
 
-        Page<CardRequestDTO> result = cardRequestService.getAll(0, 5);
+        Page<CardRequestDTO> result = cardRequestServiceImpl.getAll(0, 5);
 
         assertThat(result.getContent()).containsExactly(dto);
     }
@@ -169,7 +182,7 @@ class CardRequestServiceTest {
     @Test
     void getAll_Empty() {
         when(cardRequestRepository.findAll(PageRequest.of(0, 5))).thenReturn(Page.empty());
-        assertThatThrownBy(() -> cardRequestService.getAll(0, 5))
+        assertThatThrownBy(() -> cardRequestServiceImpl.getAll(0, 5))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
@@ -180,7 +193,7 @@ class CardRequestServiceTest {
         when(cardRequestRepository.save(any())).thenReturn(entity);
         when(cardRequestMapper.toDto(any())).thenReturn(dto);
 
-        CardRequestDTO result = cardRequestService.requestRejected(3L);
+        CardRequestDTO result = cardRequestServiceImpl.requestRejected(3L);
 
         assertThat(result).isEqualTo(dto);
     }
@@ -188,16 +201,16 @@ class CardRequestServiceTest {
     @Test
     void requestRejected_NotFound() {
         when(cardRequestRepository.findById(3L)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> cardRequestService.requestRejected(3L))
+        assertThatThrownBy(() -> cardRequestServiceImpl.requestRejected(3L))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test
     void getIsOwnerCardRequest() {
         when(cardRequestRepository.existsCardRequestByIdAndInitiator_Id(3L, 2L)).thenReturn(true);
-        boolean result = cardRequestService.getIsOwnerCardRequest(3L, 2L);
+        boolean result = cardRequestServiceImpl.getIsOwnerCardRequest(3L, 2L);
         assertThat(result).isTrue();
-        assertThat(cardRequestService.getIsOwnerCardRequest(null, null)).isFalse();
+        assertThat(cardRequestServiceImpl.getIsOwnerCardRequest(null, null)).isFalse();
     }
 
     @Test
@@ -206,7 +219,7 @@ class CardRequestServiceTest {
                 .thenReturn(Optional.of(entity));
         when(cardRequestMapper.toDto(entity)).thenReturn(dto);
 
-        CardRequestDTO result = cardRequestService.getIdByUser(3L, 2L);
+        CardRequestDTO result = cardRequestServiceImpl.getIdByUser(3L, 2L);
 
         assertThat(result).isEqualTo(dto);
     }
@@ -215,7 +228,7 @@ class CardRequestServiceTest {
     void getIdByUser_NotFound() {
         when(cardRequestRepository.findByIdAndInitiator_Id(3L, 2L))
                 .thenReturn(Optional.empty());
-        assertThatThrownBy(() -> cardRequestService.getIdByUser(3L, 2L))
+        assertThatThrownBy(() -> cardRequestServiceImpl.getIdByUser(3L, 2L))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 }
