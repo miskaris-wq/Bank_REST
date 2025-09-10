@@ -1,4 +1,4 @@
-package com.example.bankcards.dto;
+package com.example.bankcards.dto.payload;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

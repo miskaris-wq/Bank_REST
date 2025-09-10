@@ -1,8 +1,8 @@
 package com.example.bankcards.service.interfaces;
 
-import com.example.bankcards.dto.JwtDTO;
-import com.example.bankcards.dto.Requests.LoginRequest;
-import com.example.bankcards.dto.Requests.RegisterRequest;
+import com.example.bankcards.dto.payload.JwtDTO;
+import com.example.bankcards.dto.requests.LoginRequest;
+import com.example.bankcards.dto.requests.RegisterRequest;
 
 public interface AuthService {
 

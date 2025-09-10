@@ -1,7 +1,7 @@
 package com.example.bankcards.controller;
 
 import com.example.bankcards.controller.impl.CardRequestControllerImpl;
-import com.example.bankcards.dto.CardRequestDTO;
+import com.example.bankcards.dto.payload.CardRequestDTO;
 import com.example.bankcards.service.impl.CardRequestServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,10 +1,10 @@
 package com.example.bankcards.controller;
 
 import com.example.bankcards.controller.impl.CardControllerImpl;
-import com.example.bankcards.dto.BankCardDTO;
-import com.example.bankcards.dto.CardBalanceDTO;
-import com.example.bankcards.dto.Requests.CreateCardRequest;
-import com.example.bankcards.dto.Requests.ReplenishRequest;
+import com.example.bankcards.dto.payload.BankCardDTO;
+import com.example.bankcards.dto.payload.CardBalanceDTO;
+import com.example.bankcards.dto.requests.CreateCardRequest;
+import com.example.bankcards.dto.requests.ReplenishRequest;
 import com.example.bankcards.security.JwtComponent;
 import com.example.bankcards.service.impl.CardServiceImpl;
 import org.junit.jupiter.api.BeforeEach;

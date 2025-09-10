@@ -1,6 +1,6 @@
 package com.example.bankcards.mappers;
 
-import com.example.bankcards.dto.TransferUserDto;
+import com.example.bankcards.dto.payload.TransferUserDto;
 import com.example.bankcards.entity.transfer.Transfer;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

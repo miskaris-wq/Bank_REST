@@ -1,6 +1,6 @@
 package com.example.bankcards.service.interfaces;
 
-import com.example.bankcards.dto.CardRequestDTO;
+import com.example.bankcards.dto.payload.CardRequestDTO;
 import com.example.bankcards.entity.block.CardRequestStatus;
 import org.springframework.data.domain.Page;
 

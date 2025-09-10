@@ -1,14 +1,13 @@
-package com.example.bankcards.dto.Requests;
+package com.example.bankcards.dto.requests;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateCardRequest {
-    private Long ownerId;
+public class LoginRequest {
+    private String userName;
+    private String password;
 }

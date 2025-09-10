@@ -1,8 +1,8 @@
 package com.example.bankcards.service.interfaces;
 
-import com.example.bankcards.dto.BankCardDTO;
-import com.example.bankcards.dto.CardBalanceDTO;
-import com.example.bankcards.dto.Requests.CreateCardRequest;
+import com.example.bankcards.dto.payload.BankCardDTO;
+import com.example.bankcards.dto.payload.CardBalanceDTO;
+import com.example.bankcards.dto.requests.CreateCardRequest;
 import com.example.bankcards.entity.bankcard.BankCard;
 import com.example.bankcards.entity.bankcard.Status;
 import org.springframework.data.domain.Page;

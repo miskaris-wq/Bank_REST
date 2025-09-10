@@ -1,9 +1,8 @@
 package com.example.bankcards.controller.impl;
 
 import com.example.bankcards.controller.interfaces.CardRequestController;
-import com.example.bankcards.dto.CardRequestDTO;
-import com.example.bankcards.dto.Responses.CardRequestResponse;
-import com.example.bankcards.dto.Responses.CardRequestsResponse;
+import com.example.bankcards.dto.payload.CardRequestDTO;
+import com.example.bankcards.dto.response.APIResponse;
 import com.example.bankcards.service.interfaces.CardRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,44 +17,39 @@ public class CardRequestControllerImpl implements CardRequestController {
     private final CardRequestService cardRequestServiceImpl;
 
     @Override
-    public ResponseEntity<CardRequestResponse> requestBlock(Long id) {
+    public ResponseEntity<APIResponse<CardRequestDTO>> requestBlock(Long id) {
         CardRequestDTO dto = cardRequestServiceImpl.requestBlock(id);
-        CardRequestResponse response = new CardRequestResponse(dto, "Заявка на блокировку создана", HttpStatus.ACCEPTED);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body(APIResponse.ofSuccess(dto, "Заявка на блокировку создана", HttpStatus.ACCEPTED));
     }
 
     @Override
-    public ResponseEntity<CardRequestResponse> reject(Long id) {
+    public ResponseEntity<APIResponse<CardRequestDTO>> reject(Long id) {
         CardRequestDTO dto = cardRequestServiceImpl.requestRejected(id);
-        CardRequestResponse response = new CardRequestResponse(dto, "Заявка отклонена администратором", HttpStatus.OK);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(APIResponse.ofSuccess(dto, "Заявка отклонена администратором", HttpStatus.OK));
     }
 
     @Override
-    public ResponseEntity<CardRequestResponse> getUserRequest(Long id, Long userId) {
+    public ResponseEntity<APIResponse<CardRequestDTO>> getUserRequest(Long id, Long userId) {
         CardRequestDTO dto = cardRequestServiceImpl.getIdByUser(id, userId);
-        CardRequestResponse response = new CardRequestResponse(dto, "Заявка пользователя получена", HttpStatus.OK);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(APIResponse.ofSuccess(dto, "Заявка пользователя получена", HttpStatus.OK));
     }
 
     @Override
-    public ResponseEntity<CardRequestResponse> getById(Long id) {
+    public ResponseEntity<APIResponse<CardRequestDTO>> getById(Long id) {
         CardRequestDTO dto = cardRequestServiceImpl.getId(id);
-        CardRequestResponse response = new CardRequestResponse(dto, "Заявка найдена", HttpStatus.OK);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(APIResponse.ofSuccess(dto, "Заявка найдена", HttpStatus.OK));
     }
 
     @Override
-    public ResponseEntity<CardRequestsResponse> getAllByUser(Long userId, int page, int size) {
+    public ResponseEntity<APIResponse<Page<CardRequestDTO>>> getAllByUser(Long userId, int page, int size) {
         Page<CardRequestDTO> requests = cardRequestServiceImpl.getAllByUser(userId, page, size);
-        CardRequestsResponse response = new CardRequestsResponse(requests, "Заявки пользователя возвращены", HttpStatus.OK);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(APIResponse.ofSuccess(requests, "Заявки пользователя возвращены", HttpStatus.OK));
     }
 
     @Override
-    public ResponseEntity<CardRequestsResponse> getAll(int page, int size) {
+    public ResponseEntity<APIResponse<Page<CardRequestDTO>>> getAll(int page, int size) {
         Page<CardRequestDTO> requests = cardRequestServiceImpl.getAll(page, size);
-        CardRequestsResponse response = new CardRequestsResponse(requests, "Список всех заявок возвращён", HttpStatus.OK);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(APIResponse.ofSuccess(requests, "Список всех заявок возвращён", HttpStatus.OK));
     }
 }

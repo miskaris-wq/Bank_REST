@@ -1,8 +1,8 @@
 package com.example.bankcards.service.impl;
 
-import com.example.bankcards.dto.JwtDTO;
-import com.example.bankcards.dto.Requests.LoginRequest;
-import com.example.bankcards.dto.Requests.RegisterRequest;
+import com.example.bankcards.dto.payload.JwtDTO;
+import com.example.bankcards.dto.requests.LoginRequest;
+import com.example.bankcards.dto.requests.RegisterRequest;
 import com.example.bankcards.entity.user.User;
 import com.example.bankcards.exception.InvalidCredentialsException;
 import com.example.bankcards.exception.MissingCredentialsException;

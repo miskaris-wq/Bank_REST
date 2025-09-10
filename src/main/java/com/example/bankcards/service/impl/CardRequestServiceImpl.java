@@ -1,6 +1,6 @@
 package com.example.bankcards.service.impl;
 
-import com.example.bankcards.dto.CardRequestDTO;
+import com.example.bankcards.dto.payload.CardRequestDTO;
 import com.example.bankcards.entity.bankcard.BankCard;
 import com.example.bankcards.entity.block.CardRequest;
 import com.example.bankcards.entity.block.CardRequestStatus;

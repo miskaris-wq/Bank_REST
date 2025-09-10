@@ -1,5 +1,6 @@
-package com.example.bankcards.dto;
+package com.example.bankcards.dto.payload;
 
+import com.example.bankcards.entity.bankcard.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,9 +13,17 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CardBalanceDTO {
+public class BankCardDTO {
+
+    private Long ownerId;
+
     private Long cardId;
-    private BigDecimal balance;
-    private String maskedCardNumber;
+
     private LocalDate expirationDate;
+
+    private Status status;
+
+    private String cardNumber;
+
+    private BigDecimal balance;
 }

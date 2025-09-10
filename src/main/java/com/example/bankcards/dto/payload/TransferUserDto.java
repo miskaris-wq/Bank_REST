@@ -1,4 +1,4 @@
-package com.example.bankcards.dto;
+package com.example.bankcards.dto.payload;
 
 import com.example.bankcards.entity.transfer.TransferStatus;
 import lombok.AllArgsConstructor;

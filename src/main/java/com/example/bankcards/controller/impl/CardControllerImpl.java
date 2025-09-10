@@ -1,11 +1,11 @@
 package com.example.bankcards.controller.impl;
 
 import com.example.bankcards.controller.interfaces.CardController;
-import com.example.bankcards.dto.BankCardDTO;
-import com.example.bankcards.dto.CardBalanceDTO;
-import com.example.bankcards.dto.Requests.CreateCardRequest;
-import com.example.bankcards.dto.Requests.ReplenishRequest;
-import com.example.bankcards.dto.Responses.*;
+import com.example.bankcards.dto.payload.BankCardDTO;
+import com.example.bankcards.dto.payload.CardBalanceDTO;
+import com.example.bankcards.dto.requests.CreateCardRequest;
+import com.example.bankcards.dto.requests.ReplenishRequest;
+import com.example.bankcards.dto.response.APIResponse;
 import com.example.bankcards.service.interfaces.CardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,65 +20,56 @@ public class CardControllerImpl implements CardController {
     private final CardService cardServiceImpl;
 
     @Override
-    public ResponseEntity<CardsResponse> getAll(int page, int size) {
+    public ResponseEntity<APIResponse<Page<BankCardDTO>>> getAll(int page, int size) {
         Page<BankCardDTO> result = cardServiceImpl.getAll(page, size);
-        CardsResponse response = new CardsResponse(result, "Все карты успешно возвращены", HttpStatus.OK);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(APIResponse.ofSuccess(result, "Все карты успешно возвращены", HttpStatus.OK));
     }
 
     @Override
-    public ResponseEntity<CardsResponse> getAllByUser(Long userId, int page, int size) {
+    public ResponseEntity<APIResponse<Page<BankCardDTO>>> getAllByUser(Long userId, int page, int size) {
         Page<BankCardDTO> cards = cardServiceImpl.getAllCurrentUser(page, size, userId);
-        CardsResponse response = new CardsResponse(cards, "Карты пользователя получены", HttpStatus.OK);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(APIResponse.ofSuccess(cards, "Карты пользователя получены", HttpStatus.OK));
     }
 
     @Override
-    public ResponseEntity<CardResponse> getById(Long cardId) {
+    public ResponseEntity<APIResponse<BankCardDTO>> getById(Long cardId) {
         BankCardDTO card = cardServiceImpl.getById(cardId);
-        CardResponse response = new CardResponse(card, "Данные по карте найдены", HttpStatus.OK);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(APIResponse.ofSuccess(card, "Данные по карте найдены", HttpStatus.OK));
     }
 
     @Override
-    public ResponseEntity<CardResponse> create(CreateCardRequest request) {
+    public ResponseEntity<APIResponse<BankCardDTO>> create(CreateCardRequest request) {
         BankCardDTO newCard = cardServiceImpl.create(request);
-        CardResponse response = new CardResponse(newCard, "Карта успешно создана", HttpStatus.OK);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(APIResponse.ofSuccess(newCard, "Карта успешно создана", HttpStatus.OK));
     }
 
     @Override
-    public ResponseEntity<CardResponse> block(Long id) {
+    public ResponseEntity<APIResponse<BankCardDTO>> block(Long id) {
         BankCardDTO card = cardServiceImpl.blocked(id);
-        CardResponse response = new CardResponse(card, "Карта заблокирована", HttpStatus.OK);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(APIResponse.ofSuccess(card, "Карта заблокирована", HttpStatus.OK));
     }
 
     @Override
-    public ResponseEntity<CardResponse> activate(Long id) {
+    public ResponseEntity<APIResponse<BankCardDTO>> activate(Long id) {
         BankCardDTO card = cardServiceImpl.activate(id);
-        CardResponse response = new CardResponse(card, "Карта активирована", HttpStatus.OK);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(APIResponse.ofSuccess(card, "Карта активирована", HttpStatus.OK));
     }
 
     @Override
-    public ResponseEntity<Response<Void>> delete(Long id) {
+    public ResponseEntity<APIResponse<Void>> delete(Long id) {
         cardServiceImpl.delete(id);
-        Response<Void> response = Response.of("Карта удалена", HttpStatus.OK);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(APIResponse.ofSuccess(null, "Карта удалена", HttpStatus.OK));
     }
 
     @Override
-    public ResponseEntity<BalanceResponse> getBalance(Long userId, Long cardId) {
+    public ResponseEntity<APIResponse<CardBalanceDTO>> getBalance(Long userId, Long cardId) {
         CardBalanceDTO balance = cardServiceImpl.getBalance(userId, cardId);
-        BalanceResponse response = new BalanceResponse(balance, "Баланс карты получен", HttpStatus.OK);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(APIResponse.ofSuccess(balance, "Баланс карты получен", HttpStatus.OK));
     }
 
     @Override
-    public ResponseEntity<BalanceResponse> replenish(Long id, ReplenishRequest request) {
+    public ResponseEntity<APIResponse<CardBalanceDTO>> replenish(Long id, ReplenishRequest request) {
         CardBalanceDTO updatedBalance = cardServiceImpl.deposit(id, request.getAmount());
-        BalanceResponse response = new BalanceResponse(updatedBalance, "Баланс успешно пополнен", HttpStatus.OK);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(APIResponse.ofSuccess(updatedBalance, "Баланс успешно пополнен", HttpStatus.OK));
     }
 }

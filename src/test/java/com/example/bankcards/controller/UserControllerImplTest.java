@@ -1,9 +1,9 @@
 package com.example.bankcards.controller;
 
 import com.example.bankcards.controller.impl.UserControllerImpl;
-import com.example.bankcards.dto.CardBalanceDTO;
-import com.example.bankcards.dto.TotalCardBalanceDTO;
-import com.example.bankcards.dto.UserDTO;
+import com.example.bankcards.dto.payload.CardBalanceDTO;
+import com.example.bankcards.dto.payload.TotalCardBalanceDTO;
+import com.example.bankcards.dto.payload.UserDTO;
 import com.example.bankcards.entity.user.Role;
 import com.example.bankcards.service.impl.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -82,7 +82,7 @@ class UserControllerImplTest {
                 .andExpect(jsonPath("$.data.username").value("user2"))
                 .andExpect(jsonPath("$.data.password").value("pass2"))
                 .andExpect(jsonPath("$.data.roles").value("ADMIN"))
-                .andExpect(jsonPath("$.message").value("Пользователь успешно возвращен"));
+                .andExpect(jsonPath("$.message").value("Пользователь успешно возвращён"));
     }
 
     @Test

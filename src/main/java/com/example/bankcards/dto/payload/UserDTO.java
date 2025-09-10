@@ -1,4 +1,4 @@
-package com.example.bankcards.dto;
+package com.example.bankcards.dto.payload;
 
 import com.example.bankcards.entity.user.Role;
 import lombok.Data;
