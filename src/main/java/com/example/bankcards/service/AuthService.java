@@ -9,6 +9,7 @@ import com.example.bankcards.exception.MissingCredentialsException;
 import com.example.bankcards.exception.UserAlreadyExistsException;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.security.JwtComponent;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,19 +27,13 @@ import java.util.Date;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final JwtComponent jwtComponent;
     private final PasswordEncoder passwordEncoder;
-
-    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository, JwtComponent jwtComponent, PasswordEncoder passwordEncoder) {
-        this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
-        this.jwtComponent = jwtComponent;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     @Cacheable(cacheNames = "login", key = "#request.userName")
     public JwtDTO login(LoginRequest request){

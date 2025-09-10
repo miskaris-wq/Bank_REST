@@ -9,6 +9,7 @@ import com.example.bankcards.exception.ResourceNotFoundException;
 import com.example.bankcards.mappers.CardRequestMapper;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.CardRequestRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -19,20 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 @Service
+@AllArgsConstructor
 public class CardRequestService {
 
     private final CardRepository cardRepository;
     private final CardRequestRepository cardRequestRepository;
     private final CardRequestMapper cardRequestMapper;
     private final UserService userService;
-
-    public CardRequestService(CardRepository cardRepository, CardRequestRepository cardRequestRepository, CardRequestMapper cardRequestMapper, UserService userService) {
-        this.cardRepository = cardRepository;
-        this.cardRequestRepository = cardRequestRepository;
-        this.cardRequestMapper = cardRequestMapper;
-        this.userService = userService;
-    }
-
 
     @Transactional
     @CacheEvict(value = {

@@ -10,6 +10,7 @@ import com.example.bankcards.exception.CustomUserNotFoundException;
 import com.example.bankcards.mappers.BankCardBalanceMapper;
 import com.example.bankcards.mappers.UserMapper;
 import com.example.bankcards.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
@@ -25,6 +26,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
@@ -32,14 +34,6 @@ public class UserService {
     private final BankCardBalanceMapper bankCardBalanceMapper;
     private final PasswordEncoder passwordEncoder;
     private final CardService cardService;
-
-    public UserService(UserRepository userRepository, UserMapper userMapper, BankCardBalanceMapper bankCardBalanceMapper, @Lazy PasswordEncoder passwordEncoder, @Lazy CardService cardService) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-        this.bankCardBalanceMapper = bankCardBalanceMapper;
-        this.passwordEncoder = passwordEncoder;
-        this.cardService = cardService;
-    }
 
     @Cacheable(cacheNames = "user", key = "#username")
     public User getUserByUsername(String username) {

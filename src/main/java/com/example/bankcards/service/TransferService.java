@@ -14,6 +14,7 @@ import com.example.bankcards.mappers.TransferMapper;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.TransferRepository;
 import com.example.bankcards.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 
 @Service
+@AllArgsConstructor
 public class TransferService {
 
     private final CardService cardService;
@@ -31,14 +33,6 @@ public class TransferService {
     private final TransferRepository transferRepository;
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
-
-    public TransferService(CardService cardService, TransferMapper transferMapper, TransferRepository transferRepository, CardRepository cardRepository, UserRepository userRepository) {
-        this.cardService = cardService;
-        this.transferMapper = transferMapper;
-        this.transferRepository = transferRepository;
-        this.cardRepository = cardRepository;
-        this.userRepository = userRepository;
-    }
 
     @Transactional
     @CacheEvict(value = "allTransfers", allEntries = true)

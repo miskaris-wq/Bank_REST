@@ -18,6 +18,7 @@ import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.util.CardEncryptionUtil;
 import com.example.bankcards.util.CardNumberGenerator;
+import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -29,6 +30,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class CardService {
 
     private final CardRepository cardRepository;
@@ -40,16 +42,6 @@ public class CardService {
     private final CardEncryptionUtil cardEncryptionUtil;
     private final UserService userService;
     private final CardRequestService cardRequestService;
-
-    public CardService(CardRepository cardRepository, UserRepository userRepository, BankCardMapper bankCardMapper, BankCardBalanceMapper bankCardBalanceMapper, CardEncryptionUtil cardEncryptionUtil, UserService userService, CardRequestService cardRequestService) {
-        this.cardRepository = cardRepository;
-        this.userRepository = userRepository;
-        this.bankCardMapper = bankCardMapper;
-        this.bankCardBalanceMapper = bankCardBalanceMapper;
-        this.cardEncryptionUtil = cardEncryptionUtil;
-        this.userService = userService;
-        this.cardRequestService = cardRequestService;
-    }
 
     @Transactional
     @CacheEvict(value = {
