@@ -90,7 +90,7 @@ public class CardServiceImpl implements CardService {
                 .orElseThrow(() -> new CardNotFoundException("Карта с ID " + id + " не найдена"));
 
         if (card.getStatus() == status) {
-            throw new StatusAlreadySetException("Карта уже имеет статус: " + status.getStatus().toLowerCase());
+            throw new StatusAlreadySetException("Карта уже имеет статус: " + status.getNewStatus().toLowerCase());
         }
 
         card.setStatus(status);

@@ -2,22 +2,22 @@ package com.example.bankcards.entity.bankcard;
 
 import lombok.Getter;
 
+@Getter
 public enum Status {
     ACTIVE("Активна"),
     BLOCKED("Заблокирована"),
     EXPIRED("Истек срок");
 
-    @Getter
-    final String status;
+    final String newStatus;
 
-    Status(String status){
-        this.status = status;
+    Status(String newStatus){
+        this.newStatus = newStatus;
     }
 
     @Override
     public String toString() {
         return "Status{" +
-                "status='" + status + '\'' +
+                "newStatus='" + newStatus + '\'' +
                 '}';
     }
 }

@@ -38,7 +38,7 @@ public class BankCard {
     @Future(message = "Срок действия карты должен быть в будущем")
     private LocalDate expirationDate;
 
-    @Column(name = "status", nullable = false)
+    @Column(name = "newStatus", nullable = false)
     @Enumerated(EnumType.STRING)
     private Status status;
 
