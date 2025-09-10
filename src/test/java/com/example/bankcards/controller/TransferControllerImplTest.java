@@ -51,22 +51,21 @@ class TransferControllerImplTest {
     }
 
     @Test
-    @DisplayName("POST /api/v1/transfer/user/{userId} → 200 OK + completed transfer")
+    @DisplayName("POST /api/v1/transfer/user/{userId} → успешный перевод")
     void transferFromToCardUser_Success() throws Exception {
         TransferUserRequest req = TransferUserRequest.builder()
                 .fromCardId(1L)
                 .toCardId(2L)
                 .amount(BigDecimal.valueOf(100))
                 .build();
+
         TransferUserDto dto = TransferUserDto.builder()
                 .transactionId(123L)
                 .initiatorId(7L)
-                .fromCard(null)
-                .toCard(null)
                 .amount(BigDecimal.valueOf(100))
-                .status(null)
                 .createdAt(Instant.now())
                 .build();
+
         given(transferService.transferFromToCardUser(eq(7L), any(TransferUserRequest.class))).willReturn(dto);
 
         mvc.perform(post("/api/v1/transfer/user/7")
@@ -76,11 +75,11 @@ class TransferControllerImplTest {
                 .andExpect(jsonPath("$.data.transactionId").value(123))
                 .andExpect(jsonPath("$.data.initiatorId").value(7))
                 .andExpect(jsonPath("$.data.amount").value(100))
-                .andExpect(jsonPath("$.message").value("Перевод успешно завершён"));
+                .andExpect(jsonPath("$.message").value("Перевод успешно выполнен"));
     }
 
     @Test
-    @DisplayName("GET /api/v1/transfer/all → 200 OK + list of transfers")
+    @DisplayName("GET /api/v1/transfer/all → список всех переводов")
     void getAll_Success() throws Exception {
         TransferUserDto dto = TransferUserDto.builder()
                 .transactionId(201L)
@@ -88,6 +87,7 @@ class TransferControllerImplTest {
                 .amount(BigDecimal.valueOf(50))
                 .createdAt(Instant.now())
                 .build();
+
         Page<TransferUserDto> page = new PageImpl<>(List.of(dto), PageRequest.of(0, 5), 1);
         given(transferService.getAll(0, 5)).willReturn(page);
 
@@ -95,11 +95,11 @@ class TransferControllerImplTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.content[0].transactionId").value(201))
                 .andExpect(jsonPath("$.data.content[0].initiatorId").value(1))
-                .andExpect(jsonPath("$.message").value("Перевод успешно завершён"));
+                .andExpect(jsonPath("$.message").value("Все переводы возвращены"));
     }
 
     @Test
-    @DisplayName("GET /api/v1/transfer/by-user/{userId} → 200 OK + list of user transfers")
+    @DisplayName("GET /api/v1/transfer/by-user/{userId} → переводы конкретного пользователя")
     void getAllByUser_Success() throws Exception {
         TransferUserDto dto = TransferUserDto.builder()
                 .transactionId(301L)
@@ -107,6 +107,7 @@ class TransferControllerImplTest {
                 .amount(BigDecimal.valueOf(75))
                 .createdAt(Instant.now())
                 .build();
+
         Page<TransferUserDto> page = new PageImpl<>(List.of(dto), PageRequest.of(1, 3), 1);
         given(transferService.getAllByUser(1, 3, 88L)).willReturn(page);
 
@@ -116,11 +117,11 @@ class TransferControllerImplTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.content[0].transactionId").value(301))
                 .andExpect(jsonPath("$.data.content[0].initiatorId").value(88))
-                .andExpect(jsonPath("$.message").value("Все карты пользователя получены"));
+                .andExpect(jsonPath("$.message").value("История переводов пользователя получена"));
     }
 
     @Test
-    @DisplayName("GET /api/v1/transfer/{id} → 200 OK + single transfer")
+    @DisplayName("GET /api/v1/transfer/{id} → один перевод")
     void getById_Success() throws Exception {
         TransferUserDto dto = TransferUserDto.builder()
                 .transactionId(401L)
@@ -128,12 +129,13 @@ class TransferControllerImplTest {
                 .amount(BigDecimal.valueOf(200))
                 .createdAt(Instant.now())
                 .build();
+
         given(transferService.getById(401L)).willReturn(dto);
 
         mvc.perform(get("/api/v1/transfer/401"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.transactionId").value(401))
                 .andExpect(jsonPath("$.data.initiatorId").value(2))
-                .andExpect(jsonPath("$.message").value("Перевод успешно получен"));
+                .andExpect(jsonPath("$.message").value("Перевод найден"));
     }
 }

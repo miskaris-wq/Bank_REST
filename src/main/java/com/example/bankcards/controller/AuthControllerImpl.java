@@ -10,7 +10,6 @@ import com.example.bankcards.dto.Responses.Response;
 import com.example.bankcards.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -22,27 +21,24 @@ public class AuthControllerImpl implements AuthController {
         this.authService = authService;
     }
 
-
     @Override
-    public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest request){
-        JwtDTO jwtDTO = authService.login(request);
-
-        return ResponseEntity.ok().body(new JwtResponse(jwtDTO, "Пользователь вошёл успешно!", HttpStatus.OK));
+    public ResponseEntity<JwtResponse> login(LoginRequest loginRequest) {
+        JwtDTO tokenInfo = authService.login(loginRequest);
+        JwtResponse response = new JwtResponse(tokenInfo, "Вход выполнен успешно", HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<JwtResponse> register(RegisterRequest request) {
-        JwtDTO jwtDTO = authService.register(request);
-
-        return ResponseEntity.ok().body(new JwtResponse(jwtDTO, "Пользователь зарегистрирован успешно!", HttpStatus.OK));
+    public ResponseEntity<JwtResponse> register(RegisterRequest registerRequest) {
+        JwtDTO tokenInfo = authService.register(registerRequest);
+        JwtResponse response = new JwtResponse(tokenInfo, "Регистрация прошла успешно", HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<Response<Void>> logout(LogoutRequest request) {
-        authService.logout(request.getUsername());
-
-        return ResponseEntity.ok().body(Response.of("Пользователь вышел успешно!", HttpStatus.OK));
+    public ResponseEntity<Response<Void>> logout(LogoutRequest logoutRequest) {
+        authService.logout(logoutRequest.getUsername());
+        Response<Void> response = Response.of("Выход из системы выполнен", HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
-
-
 }

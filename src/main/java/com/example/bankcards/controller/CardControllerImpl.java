@@ -5,102 +5,80 @@ import com.example.bankcards.dto.BankCardDTO;
 import com.example.bankcards.dto.CardBalanceDto;
 import com.example.bankcards.dto.Requests.CreateCardRequest;
 import com.example.bankcards.dto.Requests.ReplenishRequest;
-import com.example.bankcards.dto.Responses.BalanceResponse;
-import com.example.bankcards.dto.Responses.CardResponse;
-import com.example.bankcards.dto.Responses.CardsResponse;
-import com.example.bankcards.dto.Responses.Response;
+import com.example.bankcards.dto.Responses.*;
 import com.example.bankcards.service.CardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/cards")
 @RequiredArgsConstructor
 public class CardControllerImpl implements CardController {
 
     private final CardService cardService;
 
     @Override
-    @GetMapping("/all")
-    @Secured("ROLE_ADMIN")
-    public ResponseEntity<CardsResponse> getAll(
-            @RequestParam(name = "page", defaultValue = "0") int pageNumber,
-            @RequestParam(name = "size", defaultValue = "5") int pageSize) {
-        Page<BankCardDTO> cards = cardService.getAll(pageNumber, pageSize);
-        return ResponseEntity.ok().body(new CardsResponse(cards, "Все банковские карты успешно возвращены", HttpStatus.OK));
+    public ResponseEntity<CardsResponse> getAll(int page, int size) {
+        Page<BankCardDTO> result = cardService.getAll(page, size);
+        CardsResponse response = new CardsResponse(result, "Все карты успешно возвращены", HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @Override
-    @GetMapping("/all/by-user/{id}")
-    @PreAuthorize("#id == authentication.principal.id")
-    public ResponseEntity<CardsResponse> getAllCurrentUser(
-            @PathVariable(name = "id") Long id,
-            @RequestParam(name = "page", defaultValue = "0") int pageNumber,
-            @RequestParam(name = "size", defaultValue = "5") int pageSize) {
-        Page<BankCardDTO> bankCards = cardService.getAllCurrentUser(pageNumber, pageSize, id);
-        return ResponseEntity.ok().body(new CardsResponse(bankCards, "Ваши банковские карты успешно получены!", HttpStatus.OK));
+    public ResponseEntity<CardsResponse> getAllByUser(Long userId, int page, int size) {
+        Page<BankCardDTO> cards = cardService.getAllCurrentUser(page, size, userId);
+        CardsResponse response = new CardsResponse(cards, "Карты пользователя получены", HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @Override
-    @GetMapping("/{id}")
-    @PreAuthorize("@cardService.isOwnerCard(authentication.principal.id, #id)")
-    public ResponseEntity<CardResponse> getById(@PathVariable Long id) {
-        BankCardDTO bankCardDTO = cardService.getById(id);
-        return ResponseEntity.ok().body(new CardResponse(bankCardDTO, "Банковская карточка получена!", HttpStatus.OK));
+    public ResponseEntity<CardResponse> getById(Long cardId) {
+        BankCardDTO card = cardService.getById(cardId);
+        CardResponse response = new CardResponse(card, "Данные по карте найдены", HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @Override
-    @PostMapping("/create")
-    @Secured("ROLE_ADMIN")
-    public ResponseEntity<CardResponse> create(@RequestBody CreateCardRequest request) {
-        BankCardDTO bankCardDTO = cardService.create(request);
-        return ResponseEntity.ok().body(new CardResponse(bankCardDTO, "Банковская карточка успешно создана!", HttpStatus.OK));
+    public ResponseEntity<CardResponse> create(CreateCardRequest request) {
+        BankCardDTO newCard = cardService.create(request);
+        CardResponse response = new CardResponse(newCard, "Карта успешно создана", HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @Override
-    @PatchMapping("/blocked/{id}")
-    @Secured("ROLE_ADMIN")
-    public ResponseEntity<CardResponse> blocked(@PathVariable Long id) {
-        BankCardDTO bankCardDTO = cardService.blocked(id);
-        return ResponseEntity.ok().body(new CardResponse(bankCardDTO, "Банковская карточка успешно заблокирована!", HttpStatus.OK));
+    public ResponseEntity<CardResponse> block(Long id) {
+        BankCardDTO card = cardService.blocked(id);
+        CardResponse response = new CardResponse(card, "Карта заблокирована", HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @Override
-    @PatchMapping("/activate/{id}")
-    @Secured("ROLE_ADMIN")
-    public ResponseEntity<CardResponse> activate(@PathVariable Long id) {
-        BankCardDTO bankCardDTO = cardService.activate(id);
-        return ResponseEntity.ok().body(new CardResponse(bankCardDTO, "Банковская карточка успешно активирована!", HttpStatus.OK));
+    public ResponseEntity<CardResponse> activate(Long id) {
+        BankCardDTO card = cardService.activate(id);
+        CardResponse response = new CardResponse(card, "Карта активирована", HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @Override
-    @DeleteMapping("/{id}")
-    @Secured("ROLE_ADMIN")
-    public ResponseEntity<Response<Void>> delete(@PathVariable Long id) {
+    public ResponseEntity<Response<Void>> delete(Long id) {
         cardService.delete(id);
-        return ResponseEntity.ok().body(Response.of("Банковская карточка успешно удалена!", HttpStatus.OK));
+        Response<Void> response = Response.of("Карта удалена", HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @Override
-    @GetMapping("/balance/{cardId}/user/{userId}")
-    @PreAuthorize("#userId == authentication.principal.id and @cardService.isOwnerCard(#userId, #cardId)")
-    public ResponseEntity<BalanceResponse> getBalance(
-            @PathVariable Long userId,
-            @PathVariable Long cardId) {
+    public ResponseEntity<BalanceResponse> getBalance(Long userId, Long cardId) {
         CardBalanceDto balance = cardService.getBalance(userId, cardId);
-        return ResponseEntity.ok().body(new BalanceResponse(balance, "Баланс карточки успешно получен!", HttpStatus.OK));
+        BalanceResponse response = new BalanceResponse(balance, "Баланс карты получен", HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @Override
-    @PostMapping("/replenish/{id}")
-    @PreAuthorize("@cardService.isOwnerCard(principal.id, #id)")
-    public ResponseEntity<BalanceResponse> replenish(@PathVariable Long id, @RequestBody ReplenishRequest request) {
-        CardBalanceDto balance = cardService.deposit(id, request.getAmount());
-        return ResponseEntity.ok().body(new BalanceResponse(balance, "Банковская карта пополнена!", HttpStatus.OK));
+    public ResponseEntity<BalanceResponse> replenish(Long id, ReplenishRequest request) {
+        CardBalanceDto updatedBalance = cardService.deposit(id, request.getAmount());
+        BalanceResponse response = new BalanceResponse(updatedBalance, "Баланс успешно пополнен", HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 }

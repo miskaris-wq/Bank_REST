@@ -13,213 +13,106 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Card Requests", description = "Заявки на блокировку банковских карт")
 @RequestMapping("/api/v1/card-request")
-@Tag(name = "Card Requests", description = "Операции с запросами к картам")
 public interface CardRequestController {
 
     @Operation(
-            summary     = "Запросить блокировку карты",
-            description = "Пользователь создаёт заявку на блокировку своей банковской карты. " +
-                    "После успешного создания заявки карта продолжает работать до её обработки администратором.",
+            summary = "Создать заявку на блокировку",
+            description = "Владелец карты отправляет запрос на её блокировку. Пока администратор не рассмотрит заявку, карта остаётся активной.",
             responses = {
-                    @ApiResponse(
-                            responseCode = "202",
-                            description  = "Заявка на блокировку принята и ожидает обработки",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = CardRequestResponse.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description  = "Доступ запрещён: пользователь не владеет картой",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = Response.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description  = "Карта с указанным `id` не найдена",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = Response.class)
-                            )
-                    )
+                    @ApiResponse(responseCode = "202", description = "Заявка принята",
+                            content = @Content(schema = @Schema(implementation = CardRequestResponse.class))),
+                    @ApiResponse(responseCode = "403", description = "Пользователь не является владельцем карты",
+                            content = @Content(schema = @Schema(implementation = Response.class))),
+                    @ApiResponse(responseCode = "404", description = "Карта не найдена",
+                            content = @Content(schema = @Schema(implementation = Response.class)))
             }
     )
-
     @PostMapping("/block/{id}")
     @PreAuthorize("@cardService.isOwnerCard(authentication.principal.id, #id)")
-    ResponseEntity<CardRequestResponse> requestBlock(
-            @PathVariable Long id
-    );
+    ResponseEntity<CardRequestResponse> requestBlock(@PathVariable Long id);
 
     @Operation(
-            summary     = "Отклонить заявку на блокировку карты",
-            description = "Администратор отклоняет ранее созданную заявку на блокировку карты пользователя.",
+            summary = "Отклонить заявку",
+            description = "Администратор отклоняет заявку на блокировку карты.",
             responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description  = "Заявка успешно отклонена",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = CardRequestResponse.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description  = "Доступ запрещён: требуется роль администратора",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = Response.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description  = "Заявка с указанным `id` не найдена",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = Response.class)
-                            )
-                    )
+                    @ApiResponse(responseCode = "200", description = "Заявка отклонена",
+                            content = @Content(schema = @Schema(implementation = CardRequestResponse.class))),
+                    @ApiResponse(responseCode = "403", description = "Нет прав администратора",
+                            content = @Content(schema = @Schema(implementation = Response.class))),
+                    @ApiResponse(responseCode = "404", description = "Заявка не найдена",
+                            content = @Content(schema = @Schema(implementation = Response.class)))
             }
     )
-    @PostMapping("/rejected/{id}")
     @Secured("ROLE_ADMIN")
-    ResponseEntity<CardRequestResponse> requestRejected(@PathVariable Long id);
+    @PostMapping("/rejected/{id}")
+    ResponseEntity<CardRequestResponse> reject(@PathVariable Long id);
 
     @Operation(
-            summary     = "Получить заявку на блокировку по ID",
-            description = "Возвращает детали ранее созданной заявки на блокировку карты по её идентификатору.",
+            summary = "Получить заявку пользователя по ID",
+            description = "Возвращает заявку на блокировку карты, если она принадлежит текущему пользователю.",
             responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description  = "Запрос успешно найден",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = CardRequestResponse.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description  = "Доступ запрещён: пользователь не владеет заявкой",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = Response.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description  = "Заявка с указанным `id` не найдена",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = Response.class)
-                            )
-                    )
+                    @ApiResponse(responseCode = "200", description = "Заявка найдена",
+                            content = @Content(schema = @Schema(implementation = CardRequestResponse.class))),
+                    @ApiResponse(responseCode = "403", description = "Доступ к чужой заявке запрещён",
+                            content = @Content(schema = @Schema(implementation = Response.class))),
+                    @ApiResponse(responseCode = "404", description = "Заявка не найдена",
+                            content = @Content(schema = @Schema(implementation = Response.class)))
             }
     )
     @GetMapping("/{id}/by-user")
     @PreAuthorize("#userId == authentication.principal.id and @cardRequestService.getIsOwnerCardRequest(#id, authentication.principal.id)")
-    ResponseEntity<CardRequestResponse> getIdByUser(
-            @PathVariable(name = "id") Long id,
-            @RequestParam(name = "userId") Long userId
-    );
+    ResponseEntity<CardRequestResponse> getUserRequest(@PathVariable Long id, @RequestParam Long userId);
 
     @Operation(
-            summary     = "Получить заявку на блокировку по ID (администратор)",
-            description = "Администратор получает детали ранее созданной заявки на блокировку карты по её идентификатору.",
+            summary = "Получить заявку по ID (для администратора)",
+            description = "Администратор может просмотреть любую заявку по её идентификатору.",
             responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description  = "Заявка успешно найдена",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = CardRequestResponse.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description  = "Доступ запрещён: требуется роль администратора",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = Response.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description  = "Заявка с указанным `id` не найдена",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = Response.class)
-                            )
-                    )
+                    @ApiResponse(responseCode = "200", description = "Заявка найдена",
+                            content = @Content(schema = @Schema(implementation = CardRequestResponse.class))),
+                    @ApiResponse(responseCode = "403", description = "Нет прав администратора",
+                            content = @Content(schema = @Schema(implementation = Response.class))),
+                    @ApiResponse(responseCode = "404", description = "Заявка не найдена",
+                            content = @Content(schema = @Schema(implementation = Response.class)))
             }
     )
-    @GetMapping("/{id}")
     @Secured("ROLE_ADMIN")
-    ResponseEntity<CardRequestResponse> getById(
-            @PathVariable(name = "id") Long id
-    );
+    @GetMapping("/{id}")
+    ResponseEntity<CardRequestResponse> getById(@PathVariable Long id);
 
     @Operation(
-            summary     = "Получить все заявки пользователя",
-            description = "Возвращает список заявок на блокировку карт, созданных данным пользователем.",
+            summary = "Заявки пользователя",
+            description = "Возвращает все заявки на блокировку, созданные конкретным пользователем.",
             responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description  = "Список заявок успешно возвращён",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = CardRequestsResponse.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description  = "Доступ запрещён: попытка получить заявки другого пользователя",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = Response.class)
-                            )
-                    )
+                    @ApiResponse(responseCode = "200", description = "Заявки пользователя найдены",
+                            content = @Content(schema = @Schema(implementation = CardRequestsResponse.class))),
+                    @ApiResponse(responseCode = "403", description = "Попытка получить чужие заявки",
+                            content = @Content(schema = @Schema(implementation = Response.class)))
             }
     )
     @GetMapping("/all/by-user/{userId}")
     @PreAuthorize("#userId == authentication.principal.id")
     ResponseEntity<CardRequestsResponse> getAllByUser(
-            @RequestParam(name = "page", defaultValue = "0") int pageNumber,
-            @RequestParam(name = "size", defaultValue = "5") int pageSize,
-            @PathVariable(name = "userId") Long userId
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
     );
 
-
-
     @Operation(
-            summary     = "Получить все заявки (для администратора)",
-            description = "Администратор получает полный список всех заявок на блокировку карт всех пользователей.",
+            summary = "Все заявки (администратор)",
+            description = "Администратор получает список всех заявок в системе.",
             responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description  = "Список всех заявок успешно возвращён",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = CardRequestsResponse.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description  = "Доступ запрещён: требуется роль администратора",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = Response.class)
-                            )
-                    )
+                    @ApiResponse(responseCode = "200", description = "Все заявки возвращены",
+                            content = @Content(schema = @Schema(implementation = CardRequestsResponse.class))),
+                    @ApiResponse(responseCode = "403", description = "Нет прав администратора",
+                            content = @Content(schema = @Schema(implementation = Response.class)))
             }
     )
-    @GetMapping("/all")
     @Secured("ROLE_ADMIN")
+    @GetMapping("/all")
     ResponseEntity<CardRequestsResponse> getAll(
-            @RequestParam(name = "page", defaultValue = "0") int pageNumber,
-            @RequestParam(name = "size", defaultValue = "5") int pageSize
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
     );
 }

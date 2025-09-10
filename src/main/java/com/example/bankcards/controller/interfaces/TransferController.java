@@ -15,155 +15,80 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/v1/transfer")
-@Tag(name = "Transfer",     description = "Выполнение переводов между банковскими картами пользователей и просмотр истории переводов")
+@Tag(name = "Transfers", description = "Переводы между картами и просмотр истории переводов")
 public interface TransferController {
 
     @Operation(
-            summary     = "Перевести средства между картами пользователя",
-            description = "Выполняет перевод указанной суммы с одной карты текущего пользователя на другую",
-            responses    = {
-                    @ApiResponse(
-                            responseCode = "201",
-                            description  = "Перевод выполнен успешно",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = TransferResponse.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description  = "Неверный запрос: одинаковые карты или недостаточно средств",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = Response.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description  = "Доступ запрещён: недостаточно прав",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = Response.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description  = "Одна из карт не найдена",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = Response.class)
-                            )
-                    )
-                    ,
-                    @ApiResponse(
-                            responseCode = "409",
-                            description  = "Обе карты должны быть активированы",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = Response.class)
-                            )
-                    )
+            summary = "Выполнить перевод",
+            description = "Переводит средства между картами текущего пользователя",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Перевод выполнен",
+                            content = @Content(schema = @Schema(implementation = TransferResponse.class))),
+                    @ApiResponse(responseCode = "400", description = "Неверный запрос: одинаковые карты или недостаточно средств",
+                            content = @Content(schema = @Schema(implementation = Response.class))),
+                    @ApiResponse(responseCode = "403", description = "Нет прав на выполнение операции",
+                            content = @Content(schema = @Schema(implementation = Response.class))),
+                    @ApiResponse(responseCode = "404", description = "Одна из карт не найдена",
+                            content = @Content(schema = @Schema(implementation = Response.class))),
+                    @ApiResponse(responseCode = "409", description = "Карты должны быть активны",
+                            content = @Content(schema = @Schema(implementation = Response.class)))
             }
     )
     @PostMapping("/user/{userId}")
     @PreAuthorize("#userId == authentication.principal.id and #request.toCardId != #request.fromCardId")
-    ResponseEntity<TransferResponse> transferFromToCardUser(
+    ResponseEntity<TransferResponse> transfer(
             @PathVariable Long userId,
             @RequestBody TransferUserRequest request
     );
 
     @Operation(
-            summary     = "Получить все переводы",
-            description = "Возвращает страницу списка всех переводов",
-            responses   = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description  = "Список переводов получен успешно",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = TransfersResponse.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description  = "Доступ запрещён: недостаточно прав",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = Response.class)
-                            )
-                    )
+            summary = "Все переводы (администратор)",
+            description = "Администратор получает список всех переводов",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Список переводов получен",
+                            content = @Content(schema = @Schema(implementation = TransfersResponse.class))),
+                    @ApiResponse(responseCode = "403", description = "Нет прав администратора",
+                            content = @Content(schema = @Schema(implementation = Response.class)))
             }
     )
-    @GetMapping("/all")
     @Secured("ROLE_ADMIN")
+    @GetMapping("/all")
     ResponseEntity<TransfersResponse> getAll(
-            @RequestParam(name = "page", defaultValue = "0") int pageNumber,
-            @RequestParam(name = "size", defaultValue = "5") int pageSize
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
     );
 
-
     @Operation(
-            summary     = "Получить все переводы пользователя",
-            description = "Возвращает страницу списка всех переводов, выполненных данным пользователем.",
-            responses   = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description  = "Список переводов успешно получен",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = TransfersResponse.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description  = "Доступ запрещён: попытка получить переводы другого пользователя",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = Response.class)
-                            )
-                    )
+            summary = "Переводы пользователя",
+            description = "Возвращает все переводы, выполненные конкретным пользователем",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "История переводов получена",
+                            content = @Content(schema = @Schema(implementation = TransfersResponse.class))),
+                    @ApiResponse(responseCode = "403", description = "Попытка доступа к чужой истории переводов",
+                            content = @Content(schema = @Schema(implementation = Response.class)))
             }
     )
     @GetMapping("/by-user/{userId}")
     @PreAuthorize("#userId == authentication.principal.id")
-    ResponseEntity<TransfersResponse> getAllBylUser(
-            @RequestParam(name = "page", defaultValue = "0") int pageNumber,
-            @RequestParam(name = "size", defaultValue = "5") int pageSize,
-            @PathVariable("userId") Long userId
+    ResponseEntity<TransfersResponse> getAllByUser(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
     );
 
     @Operation(
-            summary     = "Получить перевод по ID",
-            description = "Возвращает информацию о переводе по его уникальному идентификатору (доступно только администратору)",
-            responses   = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description  = "Данные перевода получены успешно",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = TransferResponse.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description  = "Доступ запрещён: недостаточно прав",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = Response.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description  = "Перевод с указанным ID не найден",
-                            content      = @Content(
-                                    mediaType = "application/json",
-                                    schema    = @Schema(implementation = Response.class)
-                            )
-                    )
+            summary = "Получить перевод по ID",
+            description = "Возвращает детали перевода по его идентификатору (только администратор)",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Данные перевода найдены",
+                            content = @Content(schema = @Schema(implementation = TransferResponse.class))),
+                    @ApiResponse(responseCode = "403", description = "Нет прав администратора",
+                            content = @Content(schema = @Schema(implementation = Response.class))),
+                    @ApiResponse(responseCode = "404", description = "Перевод не найден",
+                            content = @Content(schema = @Schema(implementation = Response.class)))
             }
     )
-    @GetMapping("/{id}")
     @Secured("ROLE_ADMIN")
+    @GetMapping("/{id}")
     ResponseEntity<TransferResponse> getById(@PathVariable Long id);
-
 }

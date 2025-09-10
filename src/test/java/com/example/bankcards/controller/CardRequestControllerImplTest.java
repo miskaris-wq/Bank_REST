@@ -56,7 +56,7 @@ class CardRequestControllerImplTest {
                 .andExpect(jsonPath("$.data.requestId").value(55))
                 .andExpect(jsonPath("$.data.cardId").value(10))
                 .andExpect(jsonPath("$.data.status").value("PENDING"))
-                .andExpect(jsonPath("$.message").value("Заявка успешно отправлена. Ждите!"));
+                .andExpect(jsonPath("$.message").value("Заявка на блокировку создана"));
     }
 
     @Test
@@ -74,7 +74,7 @@ class CardRequestControllerImplTest {
                 .andExpect(jsonPath("$.data.requestId").value(66))
                 .andExpect(jsonPath("$.data.cardId").value(11))
                 .andExpect(jsonPath("$.data.status").value("REJECTED"))
-                .andExpect(jsonPath("$.message").value("Запрос был успешно отклонён!"));
+                .andExpect(jsonPath("$.message").value("Заявка отклонена администратором"));
     }
 
     @Test
@@ -92,7 +92,7 @@ class CardRequestControllerImplTest {
                 .andExpect(jsonPath("$.data.requestId").value(77))
                 .andExpect(jsonPath("$.data.cardId").value(20))
                 .andExpect(jsonPath("$.data.status").value("PENDING"))
-                .andExpect(jsonPath("$.message").value("Запрос получен!"));
+                .andExpect(jsonPath("$.message").value("Заявка пользователя получена"));
     }
 
     @Test
@@ -110,7 +110,7 @@ class CardRequestControllerImplTest {
                 .andExpect(jsonPath("$.data.requestId").value(33))
                 .andExpect(jsonPath("$.data.cardId").value(5))
                 .andExpect(jsonPath("$.data.status").value("PENDING"))
-                .andExpect(jsonPath("$.message").value("Запрос получен!"));
+                .andExpect(jsonPath("$.message").value("Заявка найдена"));
     }
 
     @Test
@@ -129,7 +129,7 @@ class CardRequestControllerImplTest {
                 .andExpect(jsonPath("$.data.content[0].requestId").value(1))
                 .andExpect(jsonPath("$.data.content[0].cardId").value(7))
                 .andExpect(jsonPath("$.data.content[0].status").value("PENDING"))
-                .andExpect(jsonPath("$.message").value("Запрос пользователя получен!"));
+                .andExpect(jsonPath("$.message").value("Заявки пользователя возвращены"));
     }
 
     @Test
@@ -148,6 +148,6 @@ class CardRequestControllerImplTest {
                 .andExpect(jsonPath("$.data.content[0].requestId").value(2))
                 .andExpect(jsonPath("$.data.content[0].cardId").value(9))
                 .andExpect(jsonPath("$.data.content[0].status").value("REJECTED"))
-                .andExpect(jsonPath("$.message").value("Все запросы получены!"));
+                .andExpect(jsonPath("$.message").value("Список всех заявок возвращён"));
     }
 }

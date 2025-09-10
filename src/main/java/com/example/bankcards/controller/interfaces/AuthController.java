@@ -16,84 +16,65 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+@Tag(name = "Authentication", description = "Операации для входа в систему")
 @RequestMapping("/api/v1/auth")
-@Tag(name = "Authentication", description = "Операции по входу в систему")
 public interface AuthController {
 
     @Operation(
-            summary = "Логин пользователя",
-            description = "Принимает логин и пароль, возвращает JWT-токен",
+            summary = "Авторизация",
+            description = "Вход в систему по логину и паролю. Возвращает JWT-токен",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
                             description = "Успешный вход",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = JwtResponse.class)
-                            )
+                            content = @Content(schema = @Schema(implementation = JwtResponse.class))
                     ),
                     @ApiResponse(
-                            responseCode = "404",
-                            description = "Неверный логин или пароль",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = Response.class)
-                            )
+                            responseCode = "401",
+                            description = "Неверные учетные данные",
+                            content = @Content(schema = @Schema(implementation = Response.class))
                     )
             }
     )
     @PostMapping("/login")
-    ResponseEntity<JwtResponse> login(@RequestBody LoginRequest request);
+    ResponseEntity<JwtResponse> login(@RequestBody LoginRequest loginRequest);
 
     @Operation(
-            summary = "Регистрация пользователя",
-            description = "Принимает логин и пароль, возвращает JWT-токен",
+            summary = "Регистрация",
+            description = "Создание нового пользователя. В ответ возвращает JWT-токен",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Успешная регистрация",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = JwtResponse.class)
-                            )
+                            description = "Пользователь успешно зарегистрирован",
+                            content = @Content(schema = @Schema(implementation = JwtResponse.class))
                     ),
                     @ApiResponse(
                             responseCode = "400",
-                            description = "Не хватает логина или пароля",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = Response.class)
-                            )
+                            description = "Некорректные данные для регистрации",
+                            content = @Content(schema = @Schema(implementation = Response.class))
                     )
             }
     )
     @PostMapping("/register")
-    ResponseEntity<JwtResponse> register(@RequestBody RegisterRequest request);
+    ResponseEntity<JwtResponse> register(@RequestBody RegisterRequest registerRequest);
 
     @Operation(
-            summary = "Выход из системы",
-            description = "Принимает имя пользователя и выполняет выход, очищая кеши и контекст безопасности",
+            summary = "Выход",
+            description = "Выход из системы. Завершает сессию пользователя",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Успешный выход",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = Response.class)
-                            )
+                            description = "Выход выполнен",
+                            content = @Content(schema = @Schema(implementation = Response.class))
                     ),
                     @ApiResponse(
                             responseCode = "403",
-                            description = "Доступ запрещён: попытка выхода за другого пользователя",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = Response.class)
-                            )
+                            description = "Запрещено выполнять выход за другого пользователя",
+                            content = @Content(schema = @Schema(implementation = Response.class))
                     )
             }
     )
     @PostMapping("/logout")
-    @PreAuthorize("#request.getUsername() == authentication.principal.username")
-    ResponseEntity<Response<Void>> logout(@RequestBody LogoutRequest request);
-
+    @PreAuthorize("#logoutRequest.username == authentication.principal.username")
+    ResponseEntity<Response<Void>> logout(@RequestBody LogoutRequest logoutRequest);
 }

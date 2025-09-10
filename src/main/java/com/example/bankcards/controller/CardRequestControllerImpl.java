@@ -5,63 +5,57 @@ import com.example.bankcards.dto.CardRequestDTO;
 import com.example.bankcards.dto.Responses.CardRequestResponse;
 import com.example.bankcards.dto.Responses.CardRequestsResponse;
 import com.example.bankcards.service.CardRequestService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 public class CardRequestControllerImpl implements CardRequestController {
 
     private final CardRequestService cardRequestService;
 
-    public CardRequestControllerImpl(CardRequestService cardRequestService) {
-        this.cardRequestService = cardRequestService;
-    }
-
     @Override
     public ResponseEntity<CardRequestResponse> requestBlock(Long id) {
-
-        CardRequestDTO cardRequestDTO = cardRequestService.requestBlock(id);
-
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new CardRequestResponse(cardRequestDTO, "Заявка успешно отправлена. Ждите!", HttpStatus.ACCEPTED));
+        CardRequestDTO dto = cardRequestService.requestBlock(id);
+        CardRequestResponse response = new CardRequestResponse(dto, "Заявка на блокировку создана", HttpStatus.ACCEPTED);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
     @Override
-    public ResponseEntity<CardRequestResponse> requestRejected(Long id) {
-
-        CardRequestDTO cardRequestDTO = cardRequestService.requestRejected(id);
-
-        return ResponseEntity.status(HttpStatus.OK).body(new CardRequestResponse(cardRequestDTO, "Запрос был успешно отклонён!", HttpStatus.OK));
+    public ResponseEntity<CardRequestResponse> reject(Long id) {
+        CardRequestDTO dto = cardRequestService.requestRejected(id);
+        CardRequestResponse response = new CardRequestResponse(dto, "Заявка отклонена администратором", HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<CardRequestResponse> getIdByUser(Long id, Long userId) {
-        CardRequestDTO cardRequestDTO = cardRequestService.getIdByUser(id,userId);
-
-        return ResponseEntity.status(HttpStatus.OK).body(new CardRequestResponse(cardRequestDTO, "Запрос получен!", HttpStatus.OK));
+    public ResponseEntity<CardRequestResponse> getUserRequest(Long id, Long userId) {
+        CardRequestDTO dto = cardRequestService.getIdByUser(id, userId);
+        CardRequestResponse response = new CardRequestResponse(dto, "Заявка пользователя получена", HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @Override
     public ResponseEntity<CardRequestResponse> getById(Long id) {
-
-        CardRequestDTO cardRequestDTO = cardRequestService.getId(id);
-
-        return ResponseEntity.status(HttpStatus.OK).body(new CardRequestResponse(cardRequestDTO, "Запрос получен!", HttpStatus.OK));
+        CardRequestDTO dto = cardRequestService.getId(id);
+        CardRequestResponse response = new CardRequestResponse(dto, "Заявка найдена", HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<CardRequestsResponse> getAllByUser(int pageNumber, int pageSize, Long userId) {
-
-        Page<CardRequestDTO> cardRequests = cardRequestService.getAllByUser(userId, pageNumber, pageSize);
-
-        return ResponseEntity.status(HttpStatus.OK).body(new CardRequestsResponse(cardRequests, "Запрос пользователя получен!", HttpStatus.OK));
+    public ResponseEntity<CardRequestsResponse> getAllByUser(Long userId, int page, int size) {
+        Page<CardRequestDTO> requests = cardRequestService.getAllByUser(userId, page, size);
+        CardRequestsResponse response = new CardRequestsResponse(requests, "Заявки пользователя возвращены", HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<CardRequestsResponse> getAll(int pageNumber, int pageSize) {
-        Page<CardRequestDTO> cardRequests = cardRequestService.getAll(pageNumber, pageSize);
-
-        return ResponseEntity.status(HttpStatus.OK).body(new CardRequestsResponse(cardRequests, "Все запросы получены!", HttpStatus.OK));
+    public ResponseEntity<CardRequestsResponse> getAll(int page, int size) {
+        Page<CardRequestDTO> requests = cardRequestService.getAll(page, size);
+        CardRequestsResponse response = new CardRequestsResponse(requests, "Список всех заявок возвращён", HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 }
