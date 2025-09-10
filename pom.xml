@@ -23,6 +23,7 @@
         <java.version>21</java.version>
         <jwt>0.12.6</jwt>
         <mapstruct.version>1.6.3</mapstruct.version>
+        <sonar.organization>miskaris-wq</sonar.organization>
     </properties>
 
     <dependencyManagement>
