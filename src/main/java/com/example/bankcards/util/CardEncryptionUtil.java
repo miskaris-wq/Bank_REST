@@ -24,9 +24,11 @@ public final class CardEncryptionUtil {
 
 
     public CardEncryptionUtil(@Value("${card.secretKey}") String base64Key) {
-        String trimmed = (base64Key != null) ? base64Key.trim() : null;
-        checkIsEmpty(trimmed);
+        if (base64Key == null || base64Key.isBlank()) {
+            throw new IllegalArgumentException("Секретный ключ карты не задан. Укажите card.secretKey в настройках приложения.");
+        }
 
+        String trimmed = base64Key.trim();
         this.secretKey = EncoderKey.fromBase64ToAes(trimmed);
     }
 
