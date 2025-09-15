@@ -33,7 +33,6 @@ public class SecurityConfig {
     private final RestAccessDeniedHandler accessDeniedHandler;
 
 
-
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, UserDetailService userDetailService, RestAuthenticationEntryPoint restAuthEntryPoint, RestAccessDeniedHandler accessDeniedHandler) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userDetailService = userDetailService;
