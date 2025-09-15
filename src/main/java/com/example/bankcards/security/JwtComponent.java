@@ -93,10 +93,9 @@ public class JwtComponent {
 
     protected boolean isTokenExpired(String token) {
         try {
-            extractExpiration(token).before(new Date());
+            return extractExpiration(token).before(new Date());
         } catch (ExpiredJwtException e) {
             return true;
         }
-        return false;
     }
 }
