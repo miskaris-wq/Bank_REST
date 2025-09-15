@@ -1,35 +1,35 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/BankRest
-    username: BankRest
-    password: BankRest
+    url: jdbc:postgresql://prod-db:5432/BankRest
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   liquibase:
     change-log: classpath:db/migration/db.changelog-master.yaml
-    contexts: development
+    contexts: production
     default-schema: public
     enabled: true
 
 server:
-  port: 8060
+  port: 8080
 
 auth:
   jwt:
-    secret: ${JWT_SECRET:f76295d1b072ce49e8808caf82091dd8b8e2451516996e217d3d7547fd7dae6e}
+    secret: ${JWT_SECRET}
     expiration: 3600000
 
 card:
-  secretKey: ${CARD_SECRET:vOL6szZ0sHYzZJx5XZArG8VUla9viG0BXgiAo7Pooas=}
+  secretKey: ${CARD_SECRET}
 
 springdoc:
   swagger-ui:
     enabled: true
   api-docs:
-    enabled: true
+    enabled: false

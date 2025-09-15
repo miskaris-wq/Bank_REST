@@ -1,47 +1,13 @@
 spring:
   application:
     name: BankRest
-  datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/BankRest}
-    username: ${SPRING_DATASOURCE_USERNAME:BankRest}
-    password: ${SPRING_DATASOURCE_PASSWORD:BankRest}
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    show-sql: ${SPRING_JPA_SHOW_SQL:true}
-    database: postgresql
-    hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-  liquibase:
-    change-log: classpath:db/migration/db.changelog-master.yaml
-  web:
-    resources:
-      static-locations:
-        - classpath:/static/
-        - file:docs/
-      static-path-pattern: /docs/**
 
-server:
-  port: 8060
-
-auth:
-  jwt:
-    secret: ${JWT_SECRET:f76295d1b072ce49e8808caf82091dd8b8e2451516996e217d3d7547fd7dae6e}
-    expiration: 3600000
-
-card:
-  secretKey: ${CARD_SECRET:vOL6szZ0sHYzZJx5XZArG8VUla9viG0BXgiAo7Pooas=}
+  profiles:
+    active: dev
 
 springdoc:
   swagger-ui:
+    path: /swagger-ui.html
     url: /v3/api-docs.yaml
-
-liquibase:
-  change-log: classpath:db/migration/db.changelog-master.yaml
-  contexts: development, production
-  default-schema: public
-  drop-first: false
-  enabled: true
-
+  api-docs:
+    path: /v3/api-docs
