@@ -13,8 +13,6 @@ public enum TransferStatus {
 
     @Override
     public String toString() {
-        return "Status{" +
-                "status='" + status + '\'' +
-                '}';
+        return status;
     }
 }

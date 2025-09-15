@@ -15,14 +15,15 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "username" ,nullable = false, unique = true)
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    @Column(name = "password" ,nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
@@ -30,8 +31,8 @@ public class User {
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id")
     )
-    @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
     private Set<Role> roles;
 
     @OneToMany(
@@ -40,11 +41,26 @@ public class User {
             orphanRemoval = true,
             fetch = FetchType.LAZY
     )
-    List<BankCard> bankCartList;
+    @Builder.Default
+    private List<BankCard> bankCardList = new java.util.ArrayList<>();
 
     @PrePersist
     public void prePersist() {
-        roles = Set.of(Role.USER);
+        if (roles == null || roles.isEmpty()) {
+            roles = Set.of(Role.USER);
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        return id != null && id.equals(((User) o).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 
     @Override
@@ -52,7 +68,6 @@ public class User {
         return "User{" +
                 "id=" + id +
                 ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
                 ", roles=" + roles +
                 '}';
     }

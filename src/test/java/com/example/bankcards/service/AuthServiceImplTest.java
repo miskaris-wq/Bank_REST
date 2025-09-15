@@ -108,7 +108,7 @@ class AuthServiceImplTest {
         User savedUser = userCaptor.getValue();
         assertThat(savedUser.getUsername()).isEqualTo(USERNAME);
         assertThat(savedUser.getPassword()).isEqualTo(ENCODED_PASSWORD);
-        assertThat(savedUser.getBankCartList()).isEqualTo(Collections.emptyList());
+        assertThat(savedUser.getBankCardList()).isEqualTo(Collections.emptyList());
         verify(jwtComponent).generateJwtToken(USERNAME);
         verify(jwtComponent).extractExpiration(TOKEN);
         assertThat(result.getToken()).isEqualTo(TOKEN);

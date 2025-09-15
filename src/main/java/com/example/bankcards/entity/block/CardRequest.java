@@ -3,16 +3,14 @@ package com.example.bankcards.entity.block;
 import com.example.bankcards.entity.bankcard.BankCard;
 import com.example.bankcards.entity.user.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "block_requests")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,7 +18,6 @@ public class CardRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -40,4 +37,26 @@ public class CardRequest {
 
     @Column(name = "message", length = 500)
     private String message;
+
+    @PrePersist
+    public void prePersist() {
+        if (requestedAt == null) {
+            requestedAt = LocalDateTime.now();
+        }
+        if (status == null) {
+            status = CardRequestStatus.PENDING;
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CardRequest)) return false;
+        return id != null && id.equals(((CardRequest) o).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

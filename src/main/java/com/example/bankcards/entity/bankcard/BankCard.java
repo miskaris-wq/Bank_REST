@@ -4,21 +4,20 @@ import com.example.bankcards.entity.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table
-@Data
+@Table(name = "bank_card")
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class BankCard {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,7 +26,7 @@ public class BankCard {
             regexp = "^\\*{4} \\*{4} \\*{4} \\d{4}$",
             message = "Номер карты должен быть в формате XXXX XXXX XXXX XXXX"
     )
-    @Column(name = "cardNumber", nullable = false)
+    @Column(name = "card_number", nullable = false)
     private String cardNumber;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -38,21 +37,24 @@ public class BankCard {
     @Future(message = "Срок действия карты должен быть в будущем")
     private LocalDate expirationDate;
 
-    @Column(name = "newStatus", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
     private Status status;
 
-    @Column(
-            name = "balance",
-            nullable = false
-    )
+    @Column(name = "balance", nullable = false)
     private BigDecimal balance;
 
     @PrePersist
     public void prePersist() {
-        status = Status.ACTIVE;
-        expirationDate = LocalDate.now().plusYears(5);
-        balance = BigDecimal.ZERO;
+        if (status == null) {
+            status = Status.ACTIVE;
+        }
+        if (expirationDate == null) {
+            expirationDate = LocalDate.now().plusYears(5);
+        }
+        if (balance == null) {
+            balance = BigDecimal.ZERO;
+        }
     }
-
 }
+

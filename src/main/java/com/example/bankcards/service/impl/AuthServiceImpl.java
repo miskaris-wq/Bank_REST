@@ -72,7 +72,7 @@ public class AuthServiceImpl implements AuthService {
         var user = User.builder()
                 .username(request.getUserName())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .bankCartList(Collections.emptyList())
+                .bankCardList(Collections.emptyList())
                 .build();
 
         userRepository.save(user);

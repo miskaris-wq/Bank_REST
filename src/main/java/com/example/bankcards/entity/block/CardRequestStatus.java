@@ -1,9 +1,18 @@
 package com.example.bankcards.entity.block;
 
+import lombok.Getter;
+
+@Getter
 public enum CardRequestStatus {
-    PENDING,
+    PENDING("Заявка ожидает рассмотрения"),
+    APPROVED("Заявка одобрена"),
+    REJECTED("Заявка отклонена");
 
-    APPROVED,
+    private final String description;
 
-    REJECTED
+    CardRequestStatus(String description) {
+        this.description = description;
+    }
+
 }
+

@@ -18,6 +18,7 @@ public class UserControllerImpl implements UserController {
 
     private final UserService userServiceImpl;
 
+
     @Override
     public ResponseEntity<APIResponse<Page<UserDTO>>> getAll(int pageNumber, int pageSize) {
         Page<UserDTO> users = userServiceImpl.getUserByUsername(pageNumber, pageSize);
