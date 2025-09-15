@@ -14,7 +14,7 @@ public class ProdCorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("https://my-frontend.com"); // 👈 твой боевой фронт
+        configuration.addAllowedOrigin("https://my-frontend.com");
         configuration.addAllowedMethod("GET");
         configuration.addAllowedMethod("POST");
         configuration.addAllowedMethod("PUT");
