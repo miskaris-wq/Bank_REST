@@ -10,6 +10,13 @@ import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Конфигурация OpenAPI/Swagger для проекта Bank Cards.
+ *
+ * <p>Содержит описание API, информацию о безопасности (JWT в заголовке)
+ * и группировку эндпоинтов по доменным областям для удобной навигации
+ * в Swagger UI.</p>
+ */
 @Configuration
 @OpenAPIDefinition(
         info = @Info(
@@ -26,9 +33,13 @@ import org.springframework.context.annotation.Configuration;
         bearerFormat = "JWT",
         in = SecuritySchemeIn.HEADER
 )
-    public class OpenApiConfig {
+public class OpenApiConfig {
 
-
+    /**
+     * Группа эндпоинтов для работы с банковскими картами.
+     *
+     * @return {@link GroupedOpenApi} с путями /api/v1/cards/**
+     */
     @Bean
     public GroupedOpenApi cardApi() {
         return GroupedOpenApi.builder()
@@ -37,6 +48,11 @@ import org.springframework.context.annotation.Configuration;
                 .build();
     }
 
+    /**
+     * Группа эндпоинтов для аутентификации.
+     *
+     * @return {@link GroupedOpenApi} с путями /api/v1/auth/**
+     */
     @Bean
     public GroupedOpenApi authenticationApi() {
         return GroupedOpenApi.builder()
@@ -45,6 +61,11 @@ import org.springframework.context.annotation.Configuration;
                 .build();
     }
 
+    /**
+     * Группа эндпоинтов для управления пользователями.
+     *
+     * @return {@link GroupedOpenApi} с путями /api/v1/user/**
+     */
     @Bean
     public GroupedOpenApi userApi() {
         return GroupedOpenApi.builder()
@@ -53,14 +74,24 @@ import org.springframework.context.annotation.Configuration;
                 .build();
     }
 
+    /**
+     * Группа эндпоинтов для денежных переводов.
+     *
+     * @return {@link GroupedOpenApi} с путями /api/v1/transfer/**
+     */
     @Bean
-    public GroupedOpenApi authApi() {
+    public GroupedOpenApi transferApi() {
         return GroupedOpenApi.builder()
                 .group("transfer")
                 .pathsToMatch("/api/v1/transfer/**")
                 .build();
     }
 
+    /**
+     * Группа эндпоинтов для запросов на блокировку карт.
+     *
+     * @return {@link GroupedOpenApi} с путями /api/v1/card-request/**
+     */
     @Bean
     public GroupedOpenApi cardRequestApi() {
         return GroupedOpenApi.builder()

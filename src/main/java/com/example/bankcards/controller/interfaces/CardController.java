@@ -16,10 +16,23 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Контроллер для операций с банковскими картами.
+ *
+ * <p>Определяет эндпоинты для получения карт, их создания,
+ * блокировки, активации, удаления и управления балансом.</p>
+ */
 @Tag(name = "Card", description = "Методы управления банковскими картами")
 @RequestMapping("/api/v1/cards")
 public interface CardController {
 
+    /**
+     * Получить список всех карт (только администратор).
+     *
+     * @param page номер страницы
+     * @param size количество элементов на странице
+     * @return постраничный список карт
+     */
     @Operation(
             summary = "Список всех карт",
             description = "Возвращает полный список карт банка постранично",
@@ -41,6 +54,14 @@ public interface CardController {
             @RequestParam(defaultValue = "5") int size
     );
 
+    /**
+     * Получить список карт конкретного пользователя.
+     *
+     * @param userId идентификатор пользователя
+     * @param page номер страницы
+     * @param size количество элементов на странице
+     * @return список карт пользователя
+     */
     @Operation(
             summary = "Карты текущего пользователя",
             description = "Возвращает список карт, принадлежащих пользователю",
@@ -63,6 +84,12 @@ public interface CardController {
             @RequestParam(defaultValue = "5") int size
     );
 
+    /**
+     * Получить карту по её идентификатору.
+     *
+     * @param cardId идентификатор карты
+     * @return DTO карты
+     */
     @Operation(
             summary = "Карта по ID",
             description = "Возвращает данные карты по её идентификатору",
@@ -81,6 +108,12 @@ public interface CardController {
     @GetMapping("/{cardId}")
     ResponseEntity<APIResponse<BankCardDTO>> getById(@PathVariable Long cardId);
 
+    /**
+     * Создать новую карту (только администратор).
+     *
+     * @param request запрос на создание карты
+     * @return созданная карта
+     */
     @Operation(
             summary = "Создать карту",
             description = "Создание новой банковской карты",
@@ -99,6 +132,12 @@ public interface CardController {
     @PostMapping("/create")
     ResponseEntity<APIResponse<BankCardDTO>> create(@RequestBody CreateCardRequest request);
 
+    /**
+     * Заблокировать карту (только администратор).
+     *
+     * @param id идентификатор карты
+     * @return обновлённая карта со статусом BLOCKED
+     */
     @Operation(
             summary = "Заблокировать карту",
             description = "Переводит карту в статус блокировки",
@@ -117,6 +156,12 @@ public interface CardController {
     @PatchMapping("/blocked/{id}")
     ResponseEntity<APIResponse<BankCardDTO>> block(@PathVariable Long id);
 
+    /**
+     * Активировать карту (только администратор).
+     *
+     * @param id идентификатор карты
+     * @return обновлённая карта со статусом ACTIVE
+     */
     @Operation(
             summary = "Активировать карту",
             description = "Снимает блокировку или активирует карту",
@@ -135,6 +180,12 @@ public interface CardController {
     @PatchMapping("/activate/{id}")
     ResponseEntity<APIResponse<BankCardDTO>> activate(@PathVariable Long id);
 
+    /**
+     * Удалить карту (только администратор).
+     *
+     * @param id идентификатор карты
+     * @return подтверждение удаления
+     */
     @Operation(
             summary = "Удалить карту",
             description = "Удаляет карту из системы",
@@ -153,6 +204,13 @@ public interface CardController {
     @DeleteMapping("/{id}")
     ResponseEntity<APIResponse<Void>> delete(@PathVariable Long id);
 
+    /**
+     * Получить баланс карты.
+     *
+     * @param userId идентификатор пользователя (владельца карты)
+     * @param cardId идентификатор карты
+     * @return баланс карты
+     */
     @Operation(
             summary = "Баланс карты",
             description = "Возвращает текущий баланс карты по ID",
@@ -171,6 +229,13 @@ public interface CardController {
     @GetMapping("/balance/{cardId}/user/{userId}")
     ResponseEntity<APIResponse<CardBalanceDTO>> getBalance(@PathVariable Long userId, @PathVariable Long cardId);
 
+    /**
+     * Пополнить карту.
+     *
+     * @param id идентификатор карты
+     * @param request объект с суммой пополнения
+     * @return карта с обновлённым балансом
+     */
     @Operation(
             summary = "Пополнить карту",
             description = "Увеличивает баланс карты на указанную сумму",

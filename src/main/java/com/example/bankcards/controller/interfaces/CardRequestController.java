@@ -13,10 +13,22 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Контроллер для работы с заявками на блокировку карт.
+ *
+ * <p>Определяет методы для создания, отклонения и просмотра заявок
+ * как для пользователей, так и для администраторов.</p>
+ */
 @Tag(name = "Card Requests", description = "Заявки на блокировку банковских карт")
 @RequestMapping("/api/v1/card-request")
 public interface CardRequestController {
 
+    /**
+     * Создать заявку на блокировку карты (для владельца).
+     *
+     * @param id идентификатор карты
+     * @return DTO созданной заявки
+     */
     @Operation(
             summary = "Создать заявку на блокировку",
             description = "Владелец карты отправляет запрос на её блокировку. Пока администратор не рассмотрит заявку, карта остаётся активной.",
@@ -39,6 +51,12 @@ public interface CardRequestController {
     @PreAuthorize("@cardService.isOwnerCard(authentication.principal.id, #id)")
     ResponseEntity<APIResponse<CardRequestDTO>> requestBlock(@PathVariable Long id);
 
+    /**
+     * Отклонить заявку на блокировку (для администратора).
+     *
+     * @param id идентификатор заявки
+     * @return обновлённая заявка со статусом REJECTED
+     */
     @Operation(
             summary = "Отклонить заявку",
             description = "Администратор отклоняет заявку на блокировку карты.",
@@ -61,6 +79,13 @@ public interface CardRequestController {
     @PostMapping("/rejected/{id}")
     ResponseEntity<APIResponse<CardRequestDTO>> reject(@PathVariable Long id);
 
+    /**
+     * Получить заявку пользователя по ID.
+     *
+     * @param id идентификатор заявки
+     * @param userId идентификатор пользователя
+     * @return заявка, если она принадлежит текущему пользователю
+     */
     @Operation(
             summary = "Получить заявку пользователя по ID",
             description = "Возвращает заявку на блокировку карты, если она принадлежит текущему пользователю.",
@@ -83,6 +108,12 @@ public interface CardRequestController {
     @PreAuthorize("#userId == authentication.principal.id and @cardRequestService.getIsOwnerCardRequest(#id, authentication.principal.id)")
     ResponseEntity<APIResponse<CardRequestDTO>> getUserRequest(@PathVariable Long id, @RequestParam Long userId);
 
+    /**
+     * Получить заявку по ID (для администратора).
+     *
+     * @param id идентификатор заявки
+     * @return DTO заявки
+     */
     @Operation(
             summary = "Получить заявку по ID (для администратора)",
             description = "Администратор может просмотреть любую заявку по её идентификатору.",
@@ -105,6 +136,14 @@ public interface CardRequestController {
     @GetMapping("/{id}")
     ResponseEntity<APIResponse<CardRequestDTO>> getById(@PathVariable Long id);
 
+    /**
+     * Получить все заявки пользователя.
+     *
+     * @param userId идентификатор пользователя
+     * @param page номер страницы
+     * @param size количество элементов на странице
+     * @return список заявок пользователя
+     */
     @Operation(
             summary = "Заявки пользователя",
             description = "Возвращает все заявки на блокировку, созданные конкретным пользователем.",
@@ -127,6 +166,13 @@ public interface CardRequestController {
             @RequestParam(defaultValue = "5") int size
     );
 
+    /**
+     * Получить все заявки в системе (для администратора).
+     *
+     * @param page номер страницы
+     * @param size количество элементов на странице
+     * @return список всех заявок
+     */
     @Operation(
             summary = "Все заявки (администратор)",
             description = "Администратор получает список всех заявок в системе.",

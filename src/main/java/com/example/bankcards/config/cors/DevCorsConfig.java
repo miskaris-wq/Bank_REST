@@ -7,10 +7,24 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+/**
+ * Конфигурация CORS для профиля {@code dev}.
+ *
+ * <p>Разрешает доступ к REST API с фронтенда, запущенного локально
+ * по адресу {@code http://localhost:3000}.
+ * Используется только в окружении разработки.</p>
+ */
 @Configuration
 @Profile("dev")
 public class DevCorsConfig {
 
+
+    /**
+     * Определяет CORS-настройки для dev-окружения.
+     *
+     * @return {@link CorsConfigurationSource} с разрешённым origin localhost:3000,
+     * всеми методами и заголовками.
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

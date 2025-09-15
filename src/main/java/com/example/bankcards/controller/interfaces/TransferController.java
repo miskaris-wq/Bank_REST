@@ -14,10 +14,23 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Контроллер для управления переводами между картами.
+ *
+ * <p>Определяет методы для выполнения переводов и просмотра истории
+ * как пользователями, так и администраторами.</p>
+ */
 @RequestMapping("/api/v1/transfer")
 @Tag(name = "Transfers", description = "Переводы между картами и просмотр истории переводов")
 public interface TransferController {
 
+    /**
+     * Выполнить перевод средств между картами пользователя.
+     *
+     * @param userId  идентификатор пользователя
+     * @param request данные для перевода (карта-отправитель, карта-получатель, сумма)
+     * @return DTO перевода
+     */
     @Operation(
             summary = "Выполнить перевод",
             description = "Переводит средства между картами текущего пользователя",
@@ -51,6 +64,13 @@ public interface TransferController {
             @RequestBody TransferUserRequest request
     );
 
+    /**
+     * Получить список всех переводов (для администратора).
+     *
+     * @param page номер страницы
+     * @param size количество элементов на странице
+     * @return постраничный список переводов
+     */
     @Operation(
             summary = "Все переводы (администратор)",
             description = "Администратор получает список всех переводов",
@@ -72,6 +92,14 @@ public interface TransferController {
             @RequestParam(defaultValue = "5") int size
     );
 
+    /**
+     * Получить все переводы, выполненные пользователем.
+     *
+     * @param userId идентификатор пользователя
+     * @param page   номер страницы
+     * @param size   количество элементов на странице
+     * @return история переводов пользователя
+     */
     @Operation(
             summary = "Переводы пользователя",
             description = "Возвращает все переводы, выполненные конкретным пользователем",
@@ -94,6 +122,12 @@ public interface TransferController {
             @RequestParam(defaultValue = "5") int size
     );
 
+    /**
+     * Получить перевод по идентификатору (для администратора).
+     *
+     * @param id идентификатор перевода
+     * @return DTO перевода
+     */
     @Operation(
             summary = "Получить перевод по ID",
             description = "Возвращает детали перевода по его идентификатору (только администратор)",

@@ -14,9 +14,22 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Контроллер для управления пользователями.
+ *
+ * <p>Определяет эндпоинты для получения списка пользователей,
+ * работы с конкретными пользователями и получения их общего баланса.</p>
+ */
 @Tag(name = "User", description = "Управление пользователями")
 public interface UserController {
 
+    /**
+     * Получить список всех пользователей (только администратор).
+     *
+     * @param pageNumber номер страницы
+     * @param pageSize   количество элементов на странице
+     * @return постраничный список пользователей
+     */
     @Operation(
             summary     = "Получить всех пользователей",
             description = "Возвращает страницу списка всех пользователей (только для администратора)",
@@ -37,6 +50,12 @@ public interface UserController {
             @RequestParam(name = "size", defaultValue = "5") int pageSize
     );
 
+    /**
+     * Получить пользователя по ID (только администратор).
+     *
+     * @param id идентификатор пользователя
+     * @return DTO пользователя
+     */
     @Operation(
             summary     = "Получить пользователя по ID",
             description = "Возвращает данные пользователя по ID",
@@ -54,6 +73,13 @@ public interface UserController {
     @Secured("ROLE_ADMIN")
     ResponseEntity<APIResponse<UserDTO>> getId(@PathVariable Long id);
 
+    /**
+     * Обновить данные пользователя по ID (только администратор).
+     *
+     * @param id      идентификатор пользователя
+     * @param userDTO обновлённые данные пользователя
+     * @return обновлённый DTO пользователя
+     */
     @Operation(
             summary     = "Обновить данные пользователя",
             description = "Обновляет информацию пользователя по ID",
@@ -74,6 +100,12 @@ public interface UserController {
             @RequestBody UserDTO userDTO
     );
 
+    /**
+     * Удалить пользователя по ID (только администратор).
+     *
+     * @param id идентификатор пользователя
+     * @return успешное удаление (без тела ответа)
+     */
     @Operation(
             summary     = "Удалить пользователя",
             description = "Удаляет пользователя по ID",
@@ -91,6 +123,12 @@ public interface UserController {
     @Secured("ROLE_ADMIN")
     ResponseEntity<APIResponse<Void>> deleteUser(@PathVariable Long id);
 
+    /**
+     * Получить общий баланс всех карт пользователя.
+     *
+     * @param userId идентификатор пользователя (должен совпадать с текущим пользователем)
+     * @return DTO с суммарным балансом
+     */
     @Operation(
             summary     = "Получить общий баланс пользователя",
             description = "Возвращает суммарный баланс всех карт пользователя",
