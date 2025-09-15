@@ -34,21 +34,21 @@ public class AuthServiceImpl implements AuthService {
     private final JwtComponent jwtComponent;
     private final PasswordEncoder passwordEncoder;
 
-    @Cacheable(cacheNames = "login", key = "#request.userName")
+    @Cacheable(cacheNames = "login", key = "#request.username")
     public JwtDTO login(LoginRequest request) {
-        if (request.getUserName() == null || request.getPassword() == null) {
+        if (request.getUsername() == null || request.getPassword() == null) {
             throw new MissingCredentialsException("Не указан логин или пароль");
         }
 
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword())
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
         } catch (AuthenticationException e) {
             throw new InvalidCredentialsException("Неверные логин или пароль");
         }
 
-        var token = jwtComponent.generateJwtToken(request.getUserName());
+        var token = jwtComponent.generateJwtToken(request.getUsername());
 
         return JwtDTO.builder()
                 .token(token)
@@ -56,21 +56,21 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
-    @Cacheable(cacheNames = "register", key = "#request.userName")
+    @Cacheable(cacheNames = "register", key = "#request.username")
     public JwtDTO register(RegisterRequest request) {
-        if (request.getUserName() == null || request.getPassword() == null) {
+        if (request.getUsername() == null || request.getPassword() == null) {
             throw new MissingCredentialsException("Не указан логин или пароль");
         }
 
-        userRepository.findByUsername(request.getUserName())
+        userRepository.findByUsername(request.getUsername())
                 .ifPresent(user -> {
                     throw new UserAlreadyExistsException(
-                            "Пользователь с логином " + request.getUserName() + " уже существует"
+                            "Пользователь с логином " + request.getUsername() + " уже существует"
                     );
                 });
 
         var user = User.builder()
-                .username(request.getUserName())
+                .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .bankCardList(Collections.emptyList())
                 .build();
@@ -86,8 +86,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Caching(evict = {
-            @CacheEvict(cacheNames = "login", key = "#userName"),
-            @CacheEvict(cacheNames = "register", key = "#userName")
+            @CacheEvict(cacheNames = "login", key = "#username"),
+            @CacheEvict(cacheNames = "register", key = "#username")
     })
     public void logout(String userName) {
         SecurityContextHolder.clearContext();

@@ -13,12 +13,38 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * Обработчик ошибок доступа (403 Forbidden) для REST API.
+ * <p>
+ * Используется Spring Security, чтобы возвращать клиенту JSON-ответ
+ * вместо стандартной HTML-страницы при ошибке доступа.
+ * </p>
+ *
+ * <p>Формат ответа JSON:</p>
+ * <pre>
+ * {
+ *   "status": 403,
+ *   "error": "Access Denied",
+ *   "message": "Причина отказа",
+ *   "path": "/api/v1/..."
+ * }
+ * </pre>
+ */
 @Component
 @Slf4j
 public class RestAccessDeniedHandler implements AccessDeniedHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * Обрабатывает ситуацию, когда доступ к ресурсу запрещён.
+     *
+     * @param request  HTTP-запрос
+     * @param response HTTP-ответ
+     * @param ex       исключение {@link AccessDeniedException}, вызвавшее отказ
+     * @throws IOException      если возникает ошибка записи в поток ответа
+     * @throws ServletException если возникает ошибка в обработке запроса
+     */
     @Override
     public void handle(HttpServletRequest request,
                        HttpServletResponse response,

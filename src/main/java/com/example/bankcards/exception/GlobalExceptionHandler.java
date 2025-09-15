@@ -9,9 +9,30 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.nio.file.AccessDeniedException;
 
+/**
+ * Глобальный обработчик исключений для REST-контроллеров.
+ * <p>
+ * Перехватывает исключения, возникающие в приложении,
+ * и возвращает унифицированный {@link APIResponse} с описанием ошибки.
+ * </p>
+ *
+ * Поддерживаются следующие типы ошибок:
+ * <ul>
+ *     <li>{@link ApiException} — кастомные исключения бизнес-логики;</li>
+ *     <li>{@link AccessDeniedException} — ошибки доступа (HTTP 403 Forbidden).</li>
+ * </ul>
+ *
+ * @author ksenya
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * Обработка бизнес-исключений ({@link ApiException}).
+     *
+     * @param ex выброшенное исключение
+     * @return ответ с кодом из {@link ApiException#getStatus()} и сообщением об ошибке
+     */
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<APIResponse<Void>> handleApiException(ApiException ex) {
         return ResponseEntity
@@ -19,6 +40,12 @@ public class GlobalExceptionHandler {
                 .body(APIResponse.ofError(ex.getMessage(), ex.getStatus()));
     }
 
+    /**
+     * Обработка ошибок доступа ({@link AccessDeniedException}).
+     *
+     * @param ex выброшенное исключение
+     * @return ответ с кодом {@link HttpStatus#FORBIDDEN} (403) и сообщением об ошибке
+     */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<APIResponse<Void>> handleAccessDenied(AccessDeniedException ex) {
         return ResponseEntity

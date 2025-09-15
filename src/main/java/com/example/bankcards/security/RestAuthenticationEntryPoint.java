@@ -10,8 +10,32 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+/**
+ * Обработчик ошибок аутентификации (401 Unauthorized) для REST API.
+ * <p>
+ * Используется Spring Security для возврата JSON-ответа, когда пользователь
+ * пытается получить доступ к защищённому ресурсу без аутентификации.
+ * </p>
+ *
+ * <p>Формат ответа JSON:</p>
+ * <pre>
+ * {
+ *   "error": "Необходима аутентификация",
+ *   "message": "Подробное сообщение исключения"
+ * }
+ * </pre>
+ */
 @Component
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+    /**
+     * Метод вызывается при отсутствии или недействительной аутентификации.
+     *
+     * @param req    входящий HTTP-запрос
+     * @param resp   HTTP-ответ
+     * @param authEx исключение {@link AuthenticationException}, вызвавшее ошибку
+     * @throws IOException если возникает ошибка при записи ответа
+     */
     @Override
     public void commence(HttpServletRequest req,
                          HttpServletResponse resp,
