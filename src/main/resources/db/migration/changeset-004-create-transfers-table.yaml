@@ -4,7 +4,8 @@ databaseChangeLog:
       author: "ksenya"
       preConditions:
         onFail: MARK_RAN
-        onError: HALT
+        onError:
+        nestedPreconditions:
           - not:
               tableExists:
                 tableName: transfers

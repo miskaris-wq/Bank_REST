@@ -4,10 +4,11 @@ databaseChangeLog:
       author: "ksenya"
       preConditions:
         onFail: MARK_RAN
-        onError: HALT
+        onError:
+        nestedPreconditions:
           - not:
               tableExists:
-                tableName: user_roles
+                tableName: user-roles
       changes:
         - createTable:
             tableName: user_roles
