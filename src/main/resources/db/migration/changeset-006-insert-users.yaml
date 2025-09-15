@@ -2,6 +2,17 @@ databaseChangeLog:
   - changeSet:
       id: "6"
       author: "ksenya"
+      preConditions:
+        onFail: MARK_RAN
+        onError: HALT
+          - not:
+              and:
+                - sqlCheck:
+                    expectedResult: "1"
+                    sql: "SELECT COUNT(*) FROM users WHERE username = 'admin';"
+                - sqlCheck:
+                    expectedResult: "1"
+                    sql: "SELECT COUNT(*) FROM users WHERE username = 'user';"
       changes:
         - insert:
             tableName: users

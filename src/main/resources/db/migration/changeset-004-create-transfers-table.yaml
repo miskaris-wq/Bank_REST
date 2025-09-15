@@ -2,6 +2,12 @@ databaseChangeLog:
   - changeSet:
       id: "5"
       author: "ksenya"
+      preConditions:
+        onFail: MARK_RAN
+        onError: HALT
+          - not:
+              tableExists:
+                tableName: transfers
       changes:
         - createTable:
             tableName: transfers

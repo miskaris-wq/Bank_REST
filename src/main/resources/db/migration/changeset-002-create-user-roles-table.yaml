@@ -2,6 +2,12 @@ databaseChangeLog:
   - changeSet:
       id: "2"
       author: "ksenya"
+      preConditions:
+        onFail: MARK_RAN
+        onError: HALT
+          - not:
+              tableExists:
+                tableName: user_roles
       changes:
         - createTable:
             tableName: user_roles
